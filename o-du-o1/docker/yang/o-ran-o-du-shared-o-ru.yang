@@ -1,0 +1,228 @@
+module o-ran-o-du-shared-o-ru {
+  yang-version 1.1;
+  namespace "urn:o-ran:o-ran-o-du-shared-o-ru";
+  prefix "sharedoru";
+
+  import _3gpp-common-managed-element { prefix me3gpp; }
+  import _3gpp-common-top { prefix top3gpp; }
+  import _3gpp-nr-nrm-gnbdufunction { prefix gnbdu3gpp; }
+  import ietf-inet-types { prefix "inet"; }
+
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the augmentation of the SA5 yang data model of GNBDuFunction with Shared O-RU parameters.
+
+    Copyright 2023 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2023-03-17" {
+    description
+      "version 1.0.0 - initial version";
+
+    reference "O-RAN.WG5.O-DU-O1.0-v06.00";
+  }
+
+  grouping ConfiguredClientInfoGrp {
+    description
+      "the NETCONF client information that may be configured by another
+      NETCONF client. These clients are reported independently from clients
+      manually configured or discovered using DHCP.";
+
+    leaf host {
+      type inet:host;
+      description "The IPv4 address of configured M-Plane client.";
+    }
+    leaf portNumber {
+      type inet:port-number;
+      description
+        "The configured call home port number.";
+    }
+  }
+
+  grouping SecondaryODuInfoGrp {
+    description
+      "This data type provides fields that are needed to configure O-DUs that perform
+      the Shared Resource Operator role from the single O-DU that has the Shared O-RU Host role.";
+
+    leaf oDuIdForSharedORu {
+      type string;
+      mandatory true;
+      description
+        "This parameter defines O-DUs own oduidforsharedoru to be used for fronthaul O-DU ID.";
+    }
+
+    leaf sharedResourceOperatorId {
+      when "not (../../oDuRoleOfSharedORu = 'HOST')";
+      type string;
+      description
+        "This parameter defines Shared Resource Operator ID of O-DUs,
+		 which Shared Resource Operator O-DU shall use for the user account of the NETCONF client
+         with sro-id configured. When the role of the O-DU is HOST, this attribute is not used.
+
+         Condition: When O-RU supports Multiple operator Shared O-RU configuration
+         and O-RU is configured to work in shared O-RU mode, this parameter is mandatory.";
+    }
+
+    leaf accessCotrolGroup {
+      type string;
+      description
+        "Defines the Netconf access control group per SRO O-DU, which is then created by the Shared O-RU Host
+         in the Shared O-RUs. If the role for a O-DU already exists, then that role
+         is updated with the new enum “carrier”. When the role of the O-DU is SRO, this attribute is not used.
+
+         Condition: When O-RU supports Multiple operator Shared O-RU configuration
+         and O-RU is configured to work in shared O-RU mode, this parameter is mandatory";
+    }
+
+    leaf supervisionPerODu {
+      type boolean;
+      description
+        "Operator may activate O-RU supervision per Shared Resource Operator O-DU
+         by configuring over O1 supervisionperodu to “true”, which triggers Shared O-RU Host
+         in Multi OperatorShared O-RU or primary O-DU in Single Operator Shared O-RU
+         to configure odu-id parameter in the per-odu-monitoring over Fronthaul M-plane.
+         When the role of the O-DU is SRO in Multi Operator Shared O-RU or secondary
+         in Single Operator Shared O-RU, this attribute is not used.";
+    }
+
+    list callHomeClientInfo {
+      key "host portNumber";
+      max-elements 1;
+      description
+        "In Multi Operator Shared O-RU, over O1 is send only to the Shared O-RU Host O-DU callhomeclientinfo,
+         which Shared O-RU Host O-DU shall use to configure in each Shared O-RU
+         multiple call home addresses towards O-DU.
+
+         In Single Operator Shared O-RU, over O1 is send only to the primary O-DU callhomeclientinfo,
+         which primary O-DU shall use to configure in each Shared O-RU multiple call home addresses towards O-DU.";
+
+      uses ConfiguredClientInfoGrp;
+    }
+
+    leaf-list sharedORuList {
+      type string;
+      description
+        "In Multi Operator Shared O-RU, list of Shared O-RU identities connected to the Shared O-RU Host O-DU
+         and Shared Resource Operator O-DU
+
+         In Single Operator Shared O-RU, list of Shared O-RU identities
+         connected to the primary O-DU and secondary O-DU.";
+    }
+  }
+
+  grouping SharedOruGrp {
+    description "Set of attributes needed by O-DU to configure Shared O-RU functionality";
+    reference "O-RAN.WG5.O-DU-O1.0-v06.00";
+
+    leaf oDuRoleOfSharedORu {
+      type enumeration {
+        enum HOST_AND_SRO {
+          description
+            "O-DU role as Shared O-RU Host and Shared Resource operator at the same time.
+             O-DU shall use Netconf access right group “sudo” in fronthaul.";
+        }
+
+        enum HOST {
+          description
+            "O-DU role as Shared O-RU Host. O-DU shall use Netconf access right group “sudo” in fronthaul.";
+        }
+
+        enum SRO {
+          description
+            "O-DU role as Shared Resource Operator. O-DU shall use Netconf access right group “carrier” in fronthaul.";
+        }
+      }
+      description
+        "This attribute defines the role of O-DU.
+         When O-DU role is set to “HOST_AND_SRO”,
+         O-DU simultaneously perform the Shared O-RU Host role and the Shared Resource Operator roles.
+
+         Condition: When O-RU supports Multiple Operator Shared O-RU configuration and O-RU
+         is configured to work in shared O-RU mode, this parameter is mandatory";
+    }
+
+    leaf sharedResourceOperatorId {
+      when "not (../oDuRoleOfSharedORu = 'HOST')";
+      type string;
+      description
+        "This parameter defines Shared Resource Operator ID of O-DUs,
+		 which Shared Resource Operator O-DU shall use for the user account of the NETCONF client
+         with sro-id configured. When the role of the O-DU is HOST, this attribute is not used.
+
+         Condition: When O-RU supports Multiple Operator Shared O-RU configuration
+         and O-RU is configured to work in shared O-RU mode, this parameter is mandatory";
+    }
+
+    leaf oDuIdForSharedORu {
+      when "not (../oDuRoleOfSharedORu = 'HOST')";
+      type string;
+      description
+        "This parameter defines O-DUs own oduidforsharedoru to be used for fronthaul O-DU ID.
+         When the role of the O-DU is HOST, this attribute is not used.
+
+         Condition: When O-RU supports Multiple Operator Shared O-RU or Shared O-RU Multi O-DU configuration
+         and O-RU is configured to work in shared O-RU mode, this parameter is mandatory";
+    }
+
+    list secondaryODuInfoList {
+      when "../oDuRoleOfSharedORu = 'HOST' or ../oDuRoleOfSharedORu = 'HOST_AND_SRO'";
+      key oDuIdForSharedORu;
+      description
+        "List containing information about all Secondary O-DUs, which primary O-DU in Single Operator O-RU sharing
+         or shared O-RU Host in Multi Operator O-RU sharing O-DU shall use to configure the Shared O-RUs
+         included in the sharedORuList field.
+
+         Condition: This parameter is mandatory when oDuRoleOfSharedORu is HOST or HOST_AND_SRO
+         in Multi Operator Shared O-RU or primary in Single Operator Shared O-RU.
+         When the role of the O-DU is SRO or secondary, this parameter is not used.";
+
+      uses SecondaryODuInfoGrp;
+    }
+  }
+
+  augment "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction" {
+    description
+      "Augmentation containing possible configuration for O-DU to act as Shared O-RU host.";
+
+    list SharedOruConfiguration {
+      key id;
+      description
+        "Contains attributes that is needed to configure Shared O-RU functionality";
+      reference "O-RAN.WG5.O-DU-O1.0-v06.00";
+      uses top3gpp:Top_Grp;
+      container attributes {
+        description
+          "containing attributes for configuration";
+        uses SharedOruGrp;
+      }
+    }
+  }
+}

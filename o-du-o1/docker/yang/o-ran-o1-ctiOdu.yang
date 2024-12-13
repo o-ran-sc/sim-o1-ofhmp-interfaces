@@ -1,0 +1,505 @@
+module o-ran-o1-ctiOdu {
+  yang-version 1.1;
+  namespace "urn:o-ran:o1:o-ran-o1-ctiodu:1.0";
+  prefix o-ran-o1-ctiodu;
+
+  import _3gpp-common-managed-element { prefix me3gpp; }
+  import _3gpp-common-top { prefix top3gpp; }
+  import _3gpp-common-yang-types { prefix types3gpp; }
+  import o-ran-cti-common { prefix or-ctic; }
+  import _3gpp-nr-nrm-gnbdufunction {
+    prefix "gnbdu3gpp";
+  }
+
+  import ietf-yang-types {
+    prefix yang;
+  }
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import o-ran-common-yang-types {
+    prefix or-types;
+  }
+
+  import o-ran-wg5-features {
+    prefix or-features;
+  }
+
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the configuration of for an O-DU that implements
+    the O-RAN WG4 Cooperative transport Interface. If transport specific
+    configuration is required, it is expected that this will be achieved using
+    a technology specific augmentation.
+
+    Copyright 2023 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2023-03-17" {
+    description
+      "version 04.00
+
+      updated to completed IM in CTI TMP v4
+      ";
+
+    reference "ORAN-WG4.CTI-TMP.0-v04.00";
+  }
+
+  revision "2022-07-04" {
+    description
+      "version 3.0.0
+
+      IM/DM updated for O1 and camelcase
+
+      Note: the integration (augmentation) of the CTIConfig IOC
+      into the broader O-DU Data Model is subject to further study and
+      optimization in a future version of the file.";
+
+    reference "ORAN-WG4.CTI-TMP.0-v3.00";
+  }
+
+  //InformationObjectClass CTIFunction attributes
+  grouping CTIFunctionGrp {
+    description "Root level of configuration of CTI Clients";
+    leaf ctiActivateOnOdu {
+        type boolean;
+        mandatory true;
+        description "Activation of CTI functionality on this O-DU";
+    }
+  }
+
+  //DataType CTIConfig attributes
+  grouping CTIConfigGrp {
+    description "Attributes of Data Type CTIConfig";
+    leaf ctiReportRateCategory {
+     type uint8 {
+        range "1..5";
+      }
+      config false;
+      mandatory true;
+      description "the supported message interval, where 1 = 5ms, 2 = 2ms, 3 = 1 ms
+      4 = 0.5ms, 5 = 0.25 ms";
+      reference "O-RAN.WG4.CTI-TCP: Table CTI Message Rate Categories for O-DU or TN";
+    }
+    leaf ctiMessageTimingPerformance {
+      type uint8;
+      units 20-microseconds;
+      config false;
+      mandatory true;
+      description
+        "The minimal spacing needed between the arrival time of the CTI message
+        and the start boundary at Ra of the mobile slot N being reported in the message";
+    }
+    leaf-list supportedCtiVersions {
+      type or-ctic:ctiVersion;
+      config false;
+      min-elements 1;
+      max-elements 15;
+      description "the list of versions of CTI TC-Plane that are supported by the CTI client";
+    }
+    leaf minNotificationAdvanceTime {
+      type uint16;
+      units milliseconds;
+      config false;
+      description "Min time in advance for reception of Notification message from TN, optional (if such messages are interpreted in O-DU)";
+    }
+    uses or-ctic:ctiTimersGrp;
+    uses or-ctic:subtypeGrp;
+    uses or-ctic:ctiListeningUdpPortGrp;
+  }
+
+  //InformationObjectClass CTIClient attributes
+  grouping CTIClientGrp {
+    description "Attributes of Information Object Class CTIClient";
+    leaf ctiClientMacAddr {
+      type yang:mac-address;
+      description "the CTI client MAC address, if this client has Ethernet connectivity to at least one CTI Server";
+    }
+    leaf ctiClientInfo {
+      type string;
+      description "optional information of the CTI client";
+    }
+    list ctiClientServerStatus {
+        key ctiServerRef;
+        leaf ctiServerRef {
+            type leafref { path "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/CTIFunction/CTIServer/attributes/ctiServerId"; }
+            mandatory true;
+            description "Reference to a given CTI Server";
+        }
+         leaf ctiClientServerActivate {
+            type boolean;
+            mandatory true;
+            description "activate CTI exchange between this client and this Server";
+        }
+        leaf ctiClientServerConnStatus {
+            type boolean;
+            config false;
+            mandatory true;
+            description "reflects whether exchange of CTI keep-alive messages with this server indicate CTI connectivity";
+        }
+        description "list of CTI servers with which the client communicates, and CTI status of Client-Server pair.";
+    }
+  }
+
+  //DataType CTISessionGroup attributes
+  grouping CTISessionGroupGrp {
+    description "Attributes of Data Type CTISessionGroup";
+    leaf ctiServerRef{
+      type leafref { path "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/CTIFunction/CTIServer/attributes/ctiServerId"; }
+      mandatory true;
+      description "Reference to corresponding CTIServer instance.";
+    }
+    leaf ctiConnProfileRef {
+      type leafref { path "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/CTIFunction/CTIConnProfile/attributes/ctiConnProfileId"; }
+      mandatory true;
+      description "Reference to corresponding CTIConnProfile instance.";
+    }
+  }
+
+  //DataType CTISession attributes
+  grouping CTISessionGrp {
+    description "Attributes of Data Type CTISession";
+    leaf ctiSessionId {
+        type string;
+        mandatory true;
+        description "the identity of a CTI session";
+      }
+    leaf oruId {
+        type string;
+        description "optional Unique identifier for O-RU, following format: mfg-name_model-name_serial-num";
+    }
+    leaf oruInterfaceId {
+        type string;
+        description "optional Unique identifier for O-RU interface, following format: mfg-name_model-name_serial-num_macaddr";
+    }
+    leaf ctiNominalReportMsgInterval {
+        type uint8;
+        units 0.25-milliseconds;
+        mandatory true;
+        description "the nominal CTI reporting message interval";
+    }
+    leaf ctiReportMessagingUseOfType1Ext {
+        type boolean;
+        mandatory true;
+        description "choice of including CTI Type 1 extension row in the CTI report messages";
+    }
+  }
+
+  //DataType CTIServer attributes
+  grouping CTIServerGrp {
+    description "Attributes of Data Type CTIServer";
+    leaf ctiServerId {
+      type string;
+      mandatory true;
+      description "Information about the CTI Server";
+    }
+    leaf ctiServerInfo {
+      type string;
+      description "Optional information about the CTI Server";
+    }
+    leaf connectivityType {
+      type enumeration {
+        enum Ethernet {
+          description "Ethernet connectivity (no IP)";
+        }
+        enum UDPIP {
+          description "UDP/IP connectivity";
+        }
+      }
+      mandatory true;
+      description "Type of connectivity to be used with this CTI server";
+    }
+    leaf ctiServerMacAddr {
+      when "../connectivityType='Ethernet'";
+      type yang:mac-address;
+      mandatory true;
+      description "the destination address used for CTI messages to the server";
+    }
+    leaf ctiServerHost {
+      when "../connectivityType='UDPIP'";
+      type inet:host;
+      mandatory true;
+      description "host (remote IP address or FQDN) for the CTI Server";
+    }
+    leaf ctiEnable {
+      type boolean;
+      mandatory true;
+      description "whether the CTI server is enabled";
+    }
+    leaf-list supportedCtiVersions {
+      type or-ctic:ctiVersion;
+      min-elements 1;
+      max-elements 15;
+      description "the list of versions of CTI TC-Plane that are supported by the CTI server. At least 1 must be supported.";
+    }
+    leaf ctiReportMessagingUseOfType2 {
+      type boolean;
+      mandatory true;
+      description "choice of including CTI Type 2 row in the CTI report messages";
+    }
+    leaf ponServerInfoUseNotificationsFromThisServer {
+      type boolean;
+      default false;
+      description "use notification from this CTI server";
+    }
+    leaf docsisServerInfo {
+      type string;
+      description "placeholder for DOCSIS specific server information";
+    }
+  }
+
+  //DataType CTIFlow attributes
+  grouping CTIFlowGrp{
+    description "Attributes of Data Type CTIFlow";
+    leaf ctiFlowId {
+      type uint8;
+      mandatory true;
+      description "the identity of a flow";
+    }
+    leaf filterType {
+       type enumeration {
+         enum Ethernet {
+           description "filter is based on L2 parameters";
+         }
+         enum UDPIP {
+           description "filter is based on L3 and/or L4 parameters";
+         }
+       }
+       mandatory true;
+       description "indication whether CTI Flow corresponds to L2 filter or L3andL4 filter in the TN";
+    }
+    list layer2Filter {
+      when "../filterType='Ethernet'";
+      key idx;
+      leaf idx { type uint32; description "dummy id"; }
+      uses or-ctic:layer2FilterGrp;
+      max-elements 1;  // 1 flow is associated with 1 filter
+      description "List of Layer 2 filters in TN for differentiating CTI flows";
+    }
+    list layer3and4Filter {
+      when "../filterType='UDPIP'";
+      key idx;
+      leaf idx { type uint32; description "dummy id"; }
+      uses or-ctic:layer3and4FilterGrp;
+      max-elements 1;  // 1 flow is associated with 1 filter
+      description "List of Layer 3 / Layer 4 filters in TN for differentiating CTI flows";
+    }
+  }
+
+  //DataType CTIFlowsInUse attributes
+  grouping CTIFlowsInUseGrp {
+    description "Attributes of Data Type CTIFlowsInUse";
+    leaf timeIntervalPerReport {
+      type uint8;
+          units 0.25-milliseconds;
+      mandatory true;
+      description "Rate of reporting for given Flow ID in given CTI session ID, in units of 0.25ms";
+    }
+    leaf maxT34Latency {
+      type uint16;
+      units 5-microseconds;
+      mandatory true;
+      description
+      "The maximum T34 latency allocated between O-RU and O-DU, in multiples of 5 microseconds";
+    }
+    leaf minLoad {
+      type uint8;
+      units Mbps;
+      default 0;
+      description
+        "The minimum load (in Mbit/s) to be used in reported Bytes field of CTI reports,
+            to be converted in amount of Bytes for the reported time interval.";
+    }
+    leaf extraLoadCplane {
+      type uint8;
+      units Mbps;
+      default 0;
+      description
+        "The extra load for uplink C-plane traffic (in Mbit/s) to be added in reported Bytes field of CTI reports,
+            to be converted in amount of Bytes for the reported time interval.";
+    }
+    leaf ctiFlowRef {
+      type leafref { path "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/CTIFunction/CTIServer/CTIFlow/attributes/ctiFlowId"; }
+      mandatory true;
+      description "Reference to corresponding CTIFlow instance.
+        When there is no use of filters or CTI flow differentation, the CTIflow ID used in the CTI messages is set to 0,
+        and there is no need to reference to a given CTIflow instance";
+    }
+  }
+
+  //DataType CTIConnProfile attributes
+  grouping CTIConnProfileGrp {
+      description "Attributes of Data Type CTIConnProfile";
+      leaf ctiConnProfileId {
+        type string;
+        mandatory true;
+        description "Unique (in O-DU) identifier for the profile";
+      }
+      leaf connectivityType {
+        type enumeration {
+          enum Ethernet {
+            description "Ethernet connectivity (no IP)";
+          }
+          enum UDPIP {
+            description "UDP/IP connectivity";
+          }
+        }
+        mandatory true;
+        description "Type of connectivity associated with this Connectivity Profile";
+      }
+      leaf vlanTagForL2 {
+        when "../connectivityType='Ethernet'";
+        type or-types:vlan-id;            // type is only used for the value, not for pointing to an interface itself
+        description "the VLAN tag to be used for CTI messages with the CTI server in case of Ethernet connectivity";
+      }
+      leaf vlanTagForL3and4 {
+        when "../connectivityType='UDPIP'";
+        type or-types:vlan-id;            // type is only used for the value, not for pointing to an interface itself
+        description "the VLAN tag to be used for CTI messages with the CTI server in case of UDP/IP connectivity";
+      }
+      leaf ctiClientHost {
+        when "../connectivityType='UDPIP'";
+        type inet:host;    // modified from local ip to host. type is only used for the value, not for pointing to an interface itself
+        description "a host on the O-DU to be used for CTI messages with the CTI server in case of UDP/IP connectivity";
+      }
+  }
+
+  //DataType CTIPattern attributes
+  grouping CTIPatternGrp {
+      description "Attributes of Data Type CTIPattern";
+      uses or-ctic:ctiPatternGrp;
+  }
+
+
+//Complete IM structure
+
+  augment "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction" {
+    if-feature or-features:CTI;
+    description "GNBDUFunction is augmented with child CTIFunction and its children elements";
+
+    list CTIFunction {
+      key id;
+      description "CTIFunction is top level of CTI functionality";
+      uses top3gpp:Top_Grp;
+      container attributes {
+        description "including CTIFunction attributes";
+        uses CTIFunctionGrp;
+      }
+      list CTIClient {
+        key id;
+        description "CTIClient is child of GNBDUFunction";
+        uses top3gpp:Top_Grp;
+        container attributes {
+          description "including CTIClient attributes";
+          uses CTIClientGrp ;
+        }
+        list CTISessionGroup {
+          key id;
+          description "CTISessionGroup is child of CTIClient";
+          uses top3gpp:Top_Grp;
+          container attributes {
+            description "including CTISessionGroup attributes";
+            uses CTISessionGroupGrp ;
+          }
+          list CTISession {
+            key id;
+            description "CTISession is child of CTISessionGroup";
+            uses top3gpp:Top_Grp;
+            container attributes {
+              description "including CTISession attributes";
+              uses CTISessionGrp ;
+            }
+            list CTIFlowsInUse {
+              key id;
+              description "CTIFlowsInUse is child of CTISession";
+              uses top3gpp:Top_Grp;
+              container attributes {
+                description "including CTIFlowsInUse attributes";
+                uses CTIFlowsInUseGrp ;
+              }
+            }
+          }
+        }
+        list CTIConfig {
+          key id;
+          max-elements 1;
+          description "CTIConfig is child of TBD";
+          uses top3gpp:Top_Grp;
+          container attributes {
+            description "including CTIConfig attributes";
+            uses CTIConfigGrp ;
+          }
+        }
+      }
+
+      list CTIServer {
+        key id;  // usually named 'id'
+        description "CTIServer is child of CTIConfig";
+        uses top3gpp:Top_Grp;
+        container attributes {
+          description "including CTIServer attributes";
+          uses CTIServerGrp ;
+        }
+        list CTIFlow {
+          key id;
+          description "CTIFlow is child of CTIServer";
+          uses top3gpp:Top_Grp;
+          container attributes {
+            description "including CTIFlow attributes";
+            uses CTIFlowGrp;
+          }
+        }
+      }
+
+      list CTIConnProfile {
+        key id;  // usually named 'id'
+        description "CTIConnProfile is child of CTIConfig";
+        uses top3gpp:Top_Grp;
+        container attributes {
+          description "including CTIConnProfile attributes";
+          uses CTIConnProfileGrp ;
+        }
+      }
+
+      list CTIPattern {
+        key id;
+        description "CTIPattern is child of CTIConfig";
+        uses top3gpp:Top_Grp;
+        container attributes {
+          description "including CTIPattern attributes";
+          uses CTIPatternGrp ;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+module o-ran-agg-ietf-hardware {
+  yang-version 1.1;
+  namespace "urn:o-ran:agg-ietf-hardware:1.0";
+  prefix "or-agg-ietf-hw";
+
+  import o-ran-aggregation-base {
+    prefix "agg";
+  }
+
+  import ietf-yang-schema-mount {
+    prefix "yangmnt";
+  }
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the augmentation of the base aggregation module to treat ietf-hardware information of each O-RU under O-DU.
+
+    Copyright 2020 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2020-09-25" {
+    description
+      "version 1.0.0 - first release of O-RAN O1 for O-DU YANG models";
+
+    reference "ORAN-WG5.MP.0-v01.00";
+  }
+
+  augment "/agg:aggregated-o-ru/agg:aggregation" {
+    container ietf-hardware-model {
+      yangmnt:mount-point "ietf-hardware-root" {
+        description
+          "Root for ietf-hardware.yang model supported per O-RU instance";
+      }
+    }
+  }
+}

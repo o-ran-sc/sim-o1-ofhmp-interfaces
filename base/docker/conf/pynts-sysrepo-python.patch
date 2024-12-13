@@ -1,0 +1,22 @@
+diff --git a/sysrepo/subscription.py b/sysrepo/subscription.py
+index 342adfb..c146f5c 100644
+--- a/sysrepo/subscription.py
++++ b/sysrepo/subscription.py
+@@ -412,6 +412,17 @@ def oper_data_callback(session, sub_id, module, xpath, req_xpath, req_id, parent
+                         # The FFI bindings of libyang and sysrepo are different.
+                         # Casting is required.
+                         parent[0] = ffi.cast("struct lyd_node *", dnode.cdata)
++        elif isinstance(oper_data, DNode):
++            # convert oper_data to a libyang.DNode object
++            with session.get_ly_ctx() as ly_ctx:                
++                if oper_data is not None:
++                    if parent[0]:
++                        root = DNode.new(ly_ctx, parent[0]).root()
++                        root.merge(oper_data, destruct=True)
++                    else:
++                        # The FFI bindings of libyang and sysrepo are different.
++                        # Casting is required.
++                        parent[0] = ffi.cast("struct lyd_node *", oper_data.cdata)
+         elif oper_data is not None:
+             raise TypeError(
+                 "bad return type from %s (expected dict or None)" % callback

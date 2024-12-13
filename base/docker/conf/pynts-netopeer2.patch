@@ -1,0 +1,52 @@
+diff --git a/src/netconf.c b/src/netconf.c
+index e0b790f..556e9c8 100644
+--- a/src/netconf.c
++++ b/src/netconf.c
+@@ -311,6 +311,21 @@ np2srv_rpc_editconfig_cb(sr_session_ctx_t *session, uint32_t UNUSED(sub_id), con
+             np_err_sr2nc_edit(session, user_sess->sess);
+             goto cleanup;
+         }
++
++        if (ds == SR_DS_RUNNING || ds == SR_DS_CANDIDATE) {
++          /* skip NACM check */
++          sr_session_switch_ds(user_sess->sess, SR_DS_STARTUP);
++
++          // sr_nacm_set_user(user_sess->sess, NULL);
++
++          if ((rc = sr_copy_config(user_sess->sess, NULL, ds, np2srv.sr_timeout))) {
++              /* prevent the error info being overwritten */
++              sr_session_dup_error(user_sess->sess, session);
++          }
++
++          /* set NACM username back */
++          // sr_nacm_set_user(user_sess->sess, nc_session_get_username(user_sess));
++        }
+     } else {
+         assert(!strcmp(testop, "test-only"));
+         if ((rc = sr_validate(user_sess->sess, NULL, 0))) {
+diff --git a/src/netconf_nmda.c b/src/netconf_nmda.c
+index 00d8cb4..fa7ced2 100644
+--- a/src/netconf_nmda.c
++++ b/src/netconf_nmda.c
+@@ -296,6 +296,21 @@ np2srv_rpc_editdata_cb(sr_session_ctx_t *session, uint32_t UNUSED(sub_id), const
+         goto cleanup;
+     }
+ 
++    if (ds == SR_DS_RUNNING || ds == SR_DS_CANDIDATE) {
++      /* skip NACM check */
++      sr_session_switch_ds(user_sess->sess, SR_DS_STARTUP);
++
++      // sr_nacm_set_user(user_sess->sess, NULL);
++
++      if ((rc = sr_copy_config(user_sess->sess, NULL, ds, np2srv.sr_timeout))) {
++          /* prevent the error info being overwritten */
++          sr_session_dup_error(user_sess->sess, session);
++      }
++
++      /* set NACM username back */
++      // sr_nacm_set_user(user_sess->sess, nc_session_get_username(user_sess));
++    }
++
+ cleanup:
+     if (user_sess) {
+         /* discard any changes that possibly failed to be applied */

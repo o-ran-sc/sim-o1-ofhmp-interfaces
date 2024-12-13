@@ -1,0 +1,46 @@
+{
+  "ietf-hardware:hardware": {
+    "last-change": "2024-05-14T10:35:11.0+00:00",
+    "component": [
+      {
+        "name": "IDU",
+        "class": "iana-hardware:chassis",
+        "description": "Indoor data unit microwave device.",
+        "contains-child": [
+          "Port1",
+          "Port2"
+        ],
+        "software-rev": "sw-rev",
+        "mfg-name": "Highstreet",
+        "model-name": "Simulated Microwave",
+        "is-fru": true,
+        "mfg-date": "2023-11-04T12:00:00+00:00",
+        "uuid": "0252b849-0103-3771-a99f-ae063abde949",
+        "state": {
+          "state-last-changed": "2024-05-14T10:35:11.0+00:00",
+          "admin-state": "unlocked",
+          "oper-state": "enabled",
+          "usage-state": "active",
+          "alarm-state": "warning",
+          "standby-state": "providing-service"
+        }
+      },
+      {
+        "name": "Port1",
+        "class": "iana-hardware:port",
+        "parent": "IDU",
+        "state": {
+          "admin-state": "unlocked"
+        }
+      },
+      {
+        "name": "Port2",
+        "class": "iana-hardware:port",
+        "parent": "IDU",
+        "state": {
+          "admin-state": "unlocked"
+        }
+      }
+    ]
+  }
+}

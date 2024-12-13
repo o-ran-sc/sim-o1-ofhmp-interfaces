@@ -1,0 +1,894 @@
+module o-ran_3gpp-nr-nrm-gnbdufunction {
+  yang-version 1.1;
+  namespace "urn:o-ran:oran-gnbdufunction";
+  prefix "or-gnbdu";
+
+  import _3gpp-common-managed-element {
+    prefix "me3gpp";
+  }
+
+  import _3gpp-nr-nrm-gnbdufunction {
+    prefix "gnbdu3gpp";
+  }
+
+  import o-ran-hardware {
+    prefix "o-ran-hw";
+  }
+
+  import ietf-hardware {
+    prefix hw;
+  }
+
+
+   organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the augmentation of the SA5 yang data model (_3gpp-nr-nrm-gnbdufunction.yang) for configuring O-RAN configuration parameters for O-DU. Configuraion Parameters per O-DU are included.
+
+    Copyright 2020 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2020-09-25" {
+    description
+      "version 1.0.0 - first release of O-RAN O1 for O-DU YANG models";
+
+    reference "ORAN-WG5.MP.0-v01.00";
+  }
+
+grouping srb-config-group {
+  container srb-config {
+    container common-configuration-mac-parameter-list {
+      leaf priority {
+        type uint8 {
+          range "1 .. 16";
+        }
+        mandatory true;
+        description "Logical channel priority";
+      }
+      leaf allowed-serv-cells {
+        type enumeration {
+          enum spcellonly;
+          enum spcell_largescell;
+          enum spcell_largescell_mediumscell;
+          enum spcell_largescell_mediumscell_smallscell;
+        }
+        description "Allowed Serving Cells used for this concerned logical channels with this Qosgroup. Size of the Scell refers to the value indicated by CellSize";
+      }
+
+      list allowed-scs-list {
+        key sub-carrier-spacing;
+        leaf sub-carrier-spacing {
+          type enumeration {
+            enum kHz15;
+            enum kHz30;
+            enum kHz60;
+            enum kHz120;
+            enum kHz240;
+          }
+          mandatory true;
+          description "Subcarrier spacing supported in NR. Only the values 15/30/60 KHz (for FR1) and 60/120 KHz (for FR2) are applicable.";
+        }
+        description "list for allowed-scs";
+      }
+      description "container for common-configuration-mac-parameter-list";
+    }
+
+      container ul-specific-parameters-list {
+        leaf max-pusch-duration {
+          type enumeration {
+            enum ms0p02;
+            enum ms0p04;
+            enum ms0p0625;
+            enum ms0p125;
+            enum ms0p25;
+            enum ms0p5;
+          }
+          description "UL MAC SDUs from this logical channel can only be transmitted using uplink grants that result in a PUSCH duration shorter than or equal to the duration indicated by this field.";
+        }
+
+        leaf configured-granttype1-allowed {
+          type boolean ;
+          mandatory true;
+          description "UL MAC SDUs from this logical channel can be transmitted on a configured grant type 1.";
+        }
+
+        leaf logical-channel-group {
+          type uint8 {
+            range "0 .. 7";
+          }
+          description "Logical Channel Group ID (LCGID)";
+        }
+
+        leaf scheduling-request-id {
+          type uint8 {
+            range "0..7";
+          }
+          description "Scheduling Request ID (SRID) Max 8. NOTE: scheduling Request id to configure SchedulingRequestConfig to SRB3.";
+        }
+
+        leaf logical-channel-sr-mask {
+          type boolean;
+          mandatory true;
+          description "Controls SR triggering when a configured uplink grant of type1 or type2 is configured. TRUE indicates that SR masking is configured for this logical channel";
+        }
+
+        leaf logical-channel-sr-delay-timer-applied {
+          type boolean;
+          mandatory true;
+          description "Indicates whether to apply the delay timer for SR transmission for this logical channel. Set to FALSE if logicalChannelSR-DelayTimer is not included in BSR-Config.";
+        }
+        leaf max-ul-harq-tx {
+          type uint8 {
+            range "1 ..8";
+          }
+          mandatory true;
+          description "Maximum number of UL HARQ transmissions";
+        }
+        description "container for ul-specific-parameters-list";
+      }
+
+      container dl-specific-parameters-list {
+        leaf max-pdsch-duration {
+          type enumeration {
+          enum ms0p02;
+          enum ms0p04;
+          enum ms0p0625;
+          enum ms0p125;
+          enum ms0p25;
+          enum ms0p5;
+          }
+          description "DL MAC SDUs from this logical channel can only be transmitted using downlink grants that result in a PDSCH duration shorter than or equal to the duration indicated by this field.";
+      }
+      leaf max-dl-harq {
+        type uint8 {
+          range "1 .. 8";
+        }
+        mandatory true;
+        description "Maximum number of DL HARQ transmissions";
+      }
+      description "container for dl-specific-parameters-list";
+    }
+        description "container for srb-config";
+        }
+        description "grouping for srb-config";
+      }
+
+grouping qos-group-config-list-group {
+  list qos-group-config-list {
+  key qos-group-index;
+  leaf qos-group-index {
+    type uint8 {
+      range 1..32;
+    }
+    mandatory true;
+    description "QoS group index specified in section 1.9";
+  }
+    leaf drx-profile-id {
+      type uint8 {
+        range 1..8;
+      }
+      description "Id of the DRX configuration set, if configured to QosGroup.";
+    }
+    container common-configuration-mac-parameter-list {
+      leaf priority {
+        type uint8 {
+          range "1 .. 16";
+        }
+        mandatory true;
+        description "Logical channel priority.";
+      }
+      leaf allowed-serv-cells {
+        type enumeration {
+          enum spcellonly;
+          enum spcell_largescell;
+          enum spcell_largescell_mediumscell;
+          enum spcell_largescell_mediumscell_smallscell;
+        }
+        description "Allowed Serving Cells used for this concerned logical channels with this Qosgroup. Size of the Scell refers to the value indicated by CellSize.";
+      }
+
+      list allowed-scs-list {
+        key sub-carrier-spacing;
+        leaf sub-carrier-spacing {
+          type enumeration {
+            enum kHz15;
+            enum kHz30;
+            enum kHz60;
+            enum kHz120;
+            enum kHz240;
+          }
+          mandatory true;
+          description "Subcarrier spacing supported in NR. Only the values 15/30/60 KHz (for FR1) and 60/120 KHz (for FR2) are applicable.";
+        }
+        description "list for allowed-scs";
+      }
+      container ul-specific-parameters-list {
+        leaf prioritised-bitrate {
+          type enumeration {
+            enum kBps0;
+            enum kBps8;
+            enum kBps16;
+            enum kBps32;
+            enum kBps64;
+            enum kBps128;
+            enum kBps256;
+            enum kBps512;
+            enum kBps1024;
+            enum kBps2048;
+            enum kBps4096;
+            enum kBps8192;
+            enum kBps16384;
+            enum kBps32768;
+            enum kBps65536;
+            enum infinity;
+          }
+          mandatory true;
+          description "Value in kiloBytes/s. Value kBps0 corresponds to 0 kiloBytes/s, value kBps8 corresponds to 8 kiloBytes/s, value kBps16 corresponds to 16 kiloBytes/s, and so on. For SRBs, the value can only be set to infinity.";
+          reference "3GPP TS 38.331";
+        }
+
+        leaf bucket-size-duration {
+          type enumeration {
+            enum ms5;
+            enum ms10;
+            enum ms15;
+            enum ms20;
+            enum ms50;
+            enum ms100;
+            enum ms150;
+            enum ms300;
+            enum ms500;
+            enum ms1000;
+          }
+          mandatory true;
+          description "Value in ms. ms5 corresponds to 5 ms, value ms10 corresponds to 10 ms, and so on.";
+          reference "3GPP TS 38.331";
+        }
+
+        leaf max-pusch-duration {
+          type enumeration {
+            enum ms0p02;
+            enum ms0p04;
+            enum ms0p625;
+            enum ms0p125;
+            enum ms0p25;
+            enum ms0p5;
+          }
+          description "UL MAC SDUs from this logical channel can only be transmitted using uplink grants that result in a PUSCH duration shorter than or equal to the duration indicated by this field. ";
+          reference "3GPP TS 38.331";
+        }
+
+        leaf configured-grant-type1-allowed {
+          type boolean;
+          mandatory true;
+          description "UL MAC SDUs from this logical channel can be transmitted on a configured grant type 1.";
+          reference "3GPP TS 38.321";
+        }
+
+        leaf logical-channnel-group {
+          type uint8 {
+            range 0..7;
+          }
+          description "Logical Channel Group ID (LCGID)";
+          reference "3GPP TS 38.331";
+        }
+
+        leaf scheduling-request-id {
+          type uint8 {
+            range 0..7;
+          }
+          description "Scheduling Request ID (SRID) Max 8. NOTE: scheduling Request id to configure SchedulingRequestConfig to each QosGroup.";
+          reference "3GPP TS 38.331";
+        }
+
+        leaf logical-channel-sr-mask {
+          type boolean;
+          mandatory true;
+          description "Controls SR triggering when a configured uplink grant of type1 or type2 is configured. TRUE indicates that SR masking is configured for this logical channel";
+          reference "3GPP TS 38.331";
+        }
+
+        leaf logical-channel-sr-delay-timer-applied {
+          type boolean;
+          mandatory true;
+          description "Indicates whether to apply the delay timer for SR transmission for this logical channel. Set to FALSE if logicalChannelSR-DelayTimer is not included in BSR-Config.";
+          reference "3GPP TS 38.331";
+        }
+
+        leaf bitrate-query-prohibit-timer {
+          type enumeration {
+            enum s0;
+            enum s0dot4;
+            enum s0dot8;
+            enum s1dot6;
+            enum s3;
+            enum s6;
+            enum s12;
+            enum s30;
+          }
+          description "The timer is used for bit rate recommendation query, in seconds.";
+          reference "3GPP TS 38.331";
+        }
+
+        leaf max-ul-harq-tx {
+          type uint8 {
+            range 1..8;
+          }
+          mandatory true;
+          description "Maximum number of UL HARQ transmissions";
+        }
+        description "container for ul-specific-parameters-list";
+      }
+
+      container dl-specific-parameters-list {
+        leaf max-pdsch-duration {
+          type enumeration {
+          enum ms0p02;
+          enum ms0p04;
+          enum ms0p0625;
+          enum ms0p125;
+          enum ms0p25;
+          enum ms0p5;
+          }
+          description "DL MAC SDUs from this logical channel can only be transmitted using downlink grants that result in a PDSCH duration shorter than or equal to the duration indicated by this field. ";
+      }
+
+      leaf max-dl-harq {
+        type uint8 {
+          range "1 .. 8";
+        }
+        mandatory true;
+        description "Maximum number of DL HARQ transmissions";
+      }
+      description "dl-specific-parameters-list";
+      }
+  description "conatiner for common-configuration-mac-parameter-list";
+  }
+  description "list for qos-group-config";
+}
+description "grouping for qos-group-config-list";
+}
+
+
+grouping drx-config-group {
+  list drx-config {
+    key drx-profile-id;
+    leaf drx-profile-id {
+      type uint8 {
+        range 1..32;
+      }
+      mandatory true;
+      description "id for drx-profile";
+    }
+
+    choice drx-on-duration-timer {
+      case drx-on-duration-timer-submilliseconds {
+        leaf drx-on-duration-timer-submilliseconds {
+          type uint8 {
+            range 1..31;
+          }
+          mandatory true;
+          description "Duration at the beginning of a DRX Cycle in submillisecond ";
+        }
+      }
+      case drx-on-duration-timer-milliseconds {
+        leaf drx-on-duration-timer-milliseconds {
+          type enumeration {
+            enum ms1;
+            enum ms2;
+            enum ms3;
+            enum ms4;
+            enum ms5;
+            enum ms6;
+            enum ms8;
+            enum ms10;
+            enum ms20;
+            enum ms30;
+            enum ms40;
+            enum ms50;
+            enum ms60;
+            enum ms80;
+            enum ms100;
+            enum ms200;
+            enum ms300;
+            enum ms400;
+            enum ms500;
+            enum ms600;
+            enum ms800;
+            enum ms1000;
+            enum ms1200;
+            enum ms1600;
+          }
+          mandatory true;
+          description "Duration at the beginning of a DRX Cycle in millisecond";
+        }
+      }
+      description "Selection of milliseconds (drx-onDurationTimer_subMilliSedonds or drx-onDurationTimer_milliSeconds)";
+    }
+
+    leaf drx-inactivity-timer {
+      type enumeration {
+        enum ms0;
+        enum ms1;
+        enum ms2;
+        enum ms3;
+        enum ms4;
+        enum ms5;
+        enum ms6;
+        enum ms8;
+        enum ms10;
+        enum ms20;
+        enum ms30;
+        enum ms40;
+        enum ms50;
+        enum ms60;
+        enum ms80;
+        enum ms100;
+        enum ms200;
+        enum ms300;
+        enum ms500;
+        enum ms750;
+        enum ms1280;
+        enum ms1920;
+        enum ms2560;
+      }
+      mandatory true;
+      description "Duration after the PDCCH occasion in which a PDCCH indicates an initial UL or DL user data transmission for the MAC entity";
+    }
+
+    leaf drx-harq-rtt-timer-dl {
+      type uint8 {
+        range 0..56;
+      }
+      mandatory true;
+      description "Minimum duration before a DL assignment for HARQ retransmission is expected by the MAC entity";
+    }
+
+    leaf drx-harq-rtt-timer-ul {
+      type uint8 {
+        range 0..56;
+      }
+      mandatory true;
+      description "Minimum duration before a UL HARQ retransmission grant is expected by the MAC entity.";
+    }
+
+    leaf drx-retransmission-timer-dl {
+      type enumeration {
+        enum sl0;
+        enum sl1;
+        enum sl2;
+        enum sl4;
+        enum sl6;
+        enum sl8;
+        enum sl16;
+        enum sl24;
+        enum sl33;
+        enum sl40;
+        enum sl64;
+        enum sl80;
+        enum sl96;
+        enum sl112;
+        enum sl28;
+        enum sl60;
+        enum sl320;
+      }
+      mandatory true;
+      description "Maximum duration until a DL retransmission is received";
+    }
+
+    leaf drx-retransmission-timer-ul {
+      type enumeration {
+        enum sl0;
+        enum sl1;
+        enum sl2;
+        enum sl4;
+        enum sl6;
+        enum sl8;
+        enum sl16;
+        enum sl24;
+        enum sl33;
+        enum sl40;
+        enum sl64;
+        enum sl80;
+        enum sl96;
+        enum sl112;
+        enum sl28;
+        enum sl60;
+        enum sl320;
+      }
+      mandatory true;
+      description "Maximum duration until a grant for UL retransmission is received";
+    }
+
+    leaf drx-long-cycle {
+      type enumeration {
+        enum ms10;
+        enum ms20;
+        enum ms32;
+        enum ms40;
+        enum ms60;
+        enum ms64;
+        enum ms70;
+        enum ms80;
+        enum ms128;
+        enum ms160;
+        enum ms256;
+        enum ms320;
+        enum ms512;
+        enum ms640;
+        enum ms1024;
+        enum ms1280;
+        enum ms2048;
+        enum ms2560;
+        enum ms5120;
+        enum ms10240;
+      }
+      mandatory true;
+      description "This parameter defines the long DRX cycle.";
+    }
+
+    container short-drx {
+
+      leaf drx-short-cycle {
+        type enumeration {
+          enum ms2;
+          enum ms3;
+          enum ms4;
+          enum ms5;
+          enum ms6;
+          enum ms7;
+          enum ms8;
+          enum ms10;
+          enum ms14;
+          enum ms16;
+          enum ms20;
+          enum ms30;
+          enum ms32;
+          enum ms35;
+          enum ms40;
+          enum ms64;
+          enum ms80;
+          enum ms128;
+          enum ms160;
+          enum ms256;
+          enum ms320;
+          enum ms512;
+          enum ms640;
+        }
+        mandatory true;
+        description "Short DRX cycle. If configured, the value of drx-LongCycle shall be a multiple of the drx-ShortCycle value. Value in multiples of drx-ShortCycle. A value of 1 corresponds to drx-ShortCycle, a value of 2 corresponds to 2 * drx-ShortCycle and so on";
+        }
+
+        leaf drx-short-cycle-timer {
+          type uint8 {
+            range 1..16;
+          }
+          mandatory true;
+          description "Duration the UE shall follow the Short DRX cycle";
+        }
+        description "container for short-drx";
+      }
+
+        list scheduling-request-config {
+          key scheduling-request-id;
+          min-elements 1;
+          leaf scheduling-request-id {
+            type uint8 {
+              range 0..7;
+            }
+            mandatory true;
+            description "Scheduling Request ID (SRID)";
+          }
+
+            leaf sr-prohibit-timer {
+              type enumeration {
+                enum ms0;
+                enum ms1;
+                enum ms2;
+                enum ms4;
+                enum ms8;
+                enum ms16;
+                enum ms32;
+                enum ms64;
+                enum ms128;
+              }
+              description "Timer for SR transmission on PUCCH";
+            }
+
+              leaf sr-trans-max {
+                type enumeration {
+                  enum n4;
+                  enum n8;
+                  enum n16;
+                  enum n32;
+                  enum n64;
+                }
+                mandatory true;
+                description "Maximum number of SR transmissions";
+              }
+              description "list for scheduling-request-config";
+         }
+         description "list for drx-config";
+    }
+    description "grouping for drx-config";
+}
+
+grouping bsr-config-group {
+  container bsr-config {
+    leaf periodicity-bsr-timer {
+      type enumeration {
+        enum sf1;
+        enum sf5;
+        enum sf10;
+        enum sf16;
+        enum sf20;
+        enum sf32;
+        enum sf40;
+        enum sf64;
+        enum sf80;
+        enum sf128;
+        enum sf160;
+        enum sf320;
+        enum sf640;
+        enum sf1280;
+        enum sf2560;
+        enum infinity;
+      }
+        mandatory true;
+        description "Value in number of subframes. Value sf1 corresponds to 1 subframe, value sf5 corresponds to 5 subframes and so on.";
+        reference "3GPP TS 38.331";
+      }
+
+      leaf retx-bsr-timer {
+        type enumeration {
+          enum sf10;
+          enum sf20;
+          enum sf40;
+          enum sf80;
+          enum sf160;
+          enum sf320;
+          enum sf640;
+          enum sf1280;
+          enum sf2560;
+          enum sf5120;
+          enum sf10240;
+        }
+        mandatory true;
+        description "Value in number of subframes. Value sf10 corresponds to 10 subframes, value sf20 corresponds to 20 subframes and so on.";
+        reference "3GPP TS 38.331";
+      }
+
+      leaf logical-channel-sr-delay-timer {
+        type enumeration {
+          enum sf20;
+          enum sf40;
+          enum sf64;
+          enum sf128;
+          enum sf512;
+          enum sf1024;
+          enum sf2560;
+        }
+        mandatory true;
+        description "Value in number of subframes. Value sf20 corresponds to 20 subframes, sf40 corresponds to 40 subframes, and so on.";
+        reference "3GPP TS 38.331";
+        }
+        description "container for bsr-config";
+      }
+      description "grouping for bsr-config";
+    }
+
+    grouping ta-configuration-group {
+      list ta-configuration-list {
+        key id;
+        min-elements 1;
+        leaf id {
+          type uint8 {
+            range 1..4;
+          }
+          description "id for ta-configuration-list";
+          }
+
+          leaf cell-size {
+            type enumeration {
+              enum large;
+              enum middle;
+              enum small;
+              enum very-small;
+            }
+            mandatory true;
+            description "Indicates the Cell size of the serving cell";
+          }
+
+          leaf time-alignment-timer {
+            type enumeration {
+              enum ms500;
+              enum ms750;
+              enum ms1280;
+              enum ms1920;
+              enum ms2560;
+              enum ms5120;
+              enum ms10240;
+              enum infinity;
+            }
+              mandatory true;
+              description "Value in ms of the timeAlignmentTimer for TAG with ID tag-Id, as specified in TS 38.321 [3].";
+          }
+          description "list for ta-configuration";
+        }
+        description "grouping for ta-configuration";
+      }
+
+      grouping phr-config-group {
+        container phr-config {
+          leaf phr-periodic-timer {
+            type enumeration {
+              enum sf10;
+              enum sf20;
+              enum sf50;
+              enum sf100;
+              enum sf200;
+              enum sf500;
+              enum sf1000;
+              enum infinity;
+            }
+            description "Value in number of subframes for PHR reporting as specified in TS 38.321 [3]. Value sf10 corresponds to 10 subframes, value sf20 corresponds to 20 subframes, and so on.";
+            reference "3GPP TS 38.331";
+          }
+
+          leaf phr-prohibit-timer {
+            type enumeration {
+              enum sf0;
+              enum sf10;
+              enum sf20;
+              enum sf50;
+              enum sf100;
+              enum sf200;
+              enum sf500;
+              enum sf1000;
+            }
+            mandatory true;
+            description "Value in number of subframes for PHR reporting as specified in TS 38.321 [3]. Value sf0 corresponds to 0 subframe, value sf10 corresponds to 10 subframes, value sf20 corresponds to 20 subframes, and so on.";
+            reference "3GPP TS 38.331";
+          }
+
+          leaf phr-tx-power-factor-change {
+            type enumeration {
+              enum db1;
+              enum db3;
+              enum db6;
+              enum infinity;
+            }
+            mandatory true;
+            description "Value in dB for PHR reporting as specified in TS 38.321 [3]. Value dB1 corresponds to 1 dB, dB3 corresponds to 3 dB and so on. The same value applies for each serving cell (although the associated functionality is performed independently for each cell).";
+            reference "3GPP TS 38.331";
+          }
+
+          leaf phr-type2-othercell {
+            type boolean;
+            mandatory true;
+            description "If set to true, the UE shall report a PHR type 2 for the SpCell of the other MAC entity. See TS 38.321 [3], clause 5.4.6. Network sets this field to false if the UE is not configured with an E-UTRA MAC entity.";
+            reference "3GPP TS 38.331";
+         }
+
+          leaf phr-mode-other-cg {
+            type enumeration {
+              enum real;
+              enum virtual;
+            }
+            mandatory true;
+            description "Indicates the mode (i.e. real or virtual) used for the PHR of the activated cells that are part of the other Cell Group (i.e. MCG or SCG), when DC is configured. If the UE is configured with only one cell group (no DC), it ignores the field.";
+            }
+            description "container for phr-config";
+          }
+          description "grouping for phr-config";
+        }
+
+grouping scell-deactivation-timer-list-group {
+  list scell-deactivation-timer-list {
+    key id;
+    min-elements 1;
+    leaf id {
+      type uint8 {
+        range 1..4;
+      }
+      mandatory true;
+      description "id for scell-deactivation-timer-list";
+    }
+
+    leaf cell-size {
+      type enumeration {
+        enum large;
+        enum middle;
+        enum small;
+        enum very-small;
+      }
+      mandatory true;
+      description "Indicate the Cell size";
+    }
+    leaf scell-deactivation-timer {
+      type enumeration {
+        enum ms20;
+        enum ms40;
+        enum ms80;
+        enum ms160;
+        enum ms200;
+        enum ms240;
+        enum ms320;
+        enum ms400;
+        enum ms480;
+        enum ms520;
+        enum ms640;
+        enum ms720;
+        enum ms840;
+        enum ms1280;
+        enum infinity;
+      }
+      mandatory true;
+      description "Scell deactivation timer";
+    }
+    description "list for scell-deactivation-timer";
+  }
+  description "grouping for scell-deactivation-timer-list";
+  }
+
+
+
+
+grouping mac-configuration-group {
+
+
+container mac-configuration {
+  uses srb-config-group;
+  uses qos-group-config-list-group;
+  uses drx-config-group;
+  uses bsr-config-group;
+  uses ta-configuration-group;
+  uses phr-config-group;
+  uses scell-deactivation-timer-list-group;
+
+
+    leaf csi-mask {
+      type boolean;
+      description "If set to true, the UE limits CSI reports to the on-duration period of the DRX cycle";
+    }
+    description "contaner for mac-configuration";
+}
+description "grouping for mac-configuration";
+}
+
+augment "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/gnbdu3gpp:attributes" {
+  when "(derived-from-or-self(/hw:hardware/hw:component/hw:class, 'o-ran-hw:O-DU-COMPONENT'))";
+  container  o-ran-configuration {
+    uses mac-configuration-group;
+    description "Container for o-ran-configuration. These are configured when O-DU is compliant with O1 interface spec for O-DU. ";
+  }
+  description "This module augments _3gpp-nr-nrm-gnbdufunction.yang for adding O-RAN original configuration parameters";
+}
+
+}

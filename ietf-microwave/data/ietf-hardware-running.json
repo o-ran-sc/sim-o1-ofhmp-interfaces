@@ -1,0 +1,29 @@
+{
+  "ietf-hardware:hardware": {
+    "component": [
+      {
+        "name": "IDU",
+        "class": "iana-hardware:chassis",
+        "state": {
+          "admin-state": "unlocked"
+        }
+      },
+      {
+        "name": "Port1",
+        "class": "iana-hardware:port",
+        "parent": "IDU",
+        "state": {
+          "admin-state": "unlocked"
+        }
+      },
+      {
+        "name": "Port2",
+        "class": "iana-hardware:port",
+        "parent": "IDU",
+        "state": {
+          "admin-state": "unlocked"
+        }
+      }
+    ]
+  }
+}
