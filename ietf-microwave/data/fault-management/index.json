@@ -1,0 +1,92 @@
+{
+    "config": {
+        "loop": false
+    },
+    "alarms": [
+        {
+            "delay": 2
+        },
+        {
+            "alarm": {
+                "resource": "testResource1",
+                "alarm-type-id": "bbf-alarm-types:bbf-security-alarm-type-id",
+                "alarm-type-qualifier": "testAlarmTypeIdUnknown1",
+
+                "is-cleared": true
+            },
+            "delay": 2
+        },
+        {
+            "alarm": {
+                "resource": "testResource2",
+                "alarm-type-id": "bbf-alarm-types:bbf-security-alarm-type-id",
+                "alarm-type-qualifier": "testAlarmTypeIdUnknown2",
+
+                "is-cleared": true
+            },
+            "delay": 2
+        },
+        {
+            "alarm": {
+                "resource": "testResource1",
+                "alarm-type-id": "bbf-alarm-types:bbf-security-alarm-type-id",
+                "alarm-type-qualifier": "testAlarmTypeIdUnknown1",
+
+                "is-cleared": false
+            },
+            "delay": 2
+        },
+        {
+            "alarm": {
+                "resource": "testResource2",
+                "alarm-type-id": "bbf-alarm-types:bbf-security-alarm-type-id",
+                "alarm-type-qualifier": "testAlarmTypeIdUnknown2",
+
+                "is-cleared": false
+            },
+            "delay": 2
+        },
+        {
+            "alarm": {
+                "resource": "otherResource",
+                "alarm-type-id": "bbf-alarm-types:bbf-security-alarm-type-id",
+                "alarm-type-qualifier": "testNewAlarm",
+
+                "perceived-severity": "minor",
+                "alarm-text": "new minor alarm"
+            },
+            "delay": 10
+        },
+        {
+            "alarm": {
+                "resource": "otherResource",
+                "alarm-type-id": "bbf-alarm-types:bbf-security-alarm-type-id",
+                "alarm-type-qualifier": "testNewAlarm",
+
+                "perceived-severity": "major",
+                "alarm-text": "text turned to major"
+            },
+            "delay": 10
+        },
+        {
+            "alarm": {
+                "resource": "otherResource",
+                "alarm-type-id": "bbf-alarm-types:bbf-security-alarm-type-id",
+                "alarm-type-qualifier": "testNewAlarm",
+
+                "perceived-severity": "cleared"
+            },
+            "delay": 10
+        },
+        {
+            "alarm": {
+                "resource": "otherResource",
+                "alarm-type-id": "bbf-alarm-types:bbf-security-alarm-type-id",
+                "alarm-type-qualifier": "testNewAlarm",
+
+                "is-cleared": false
+            },
+            "delay": 10
+        }
+    ]
+}

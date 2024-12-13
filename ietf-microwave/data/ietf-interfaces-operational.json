@@ -1,0 +1,40 @@
+{
+  "ietf-interfaces:interfaces": {
+    "interface": [
+      {
+        "name": "air0",
+        "description": "Air Interface 0",
+        "type": "iana-if-type:wwanPP2",
+        "hardware-component": {
+          "port-layer-if": ["Port1"]
+        },
+        "ietf-microwave-radio-link:tx-frequency": 1000,
+        "ietf-microwave-radio-link:rx-frequency": 1200,
+        "ietf-microwave-radio-link:channel-separation": 10,
+        "ietf-microwave-radio-link:rtpc": {
+          "maximum-nominal-power": "25.0"
+        },
+        "ietf-microwave-radio-link:single": {
+          "selected-cm": "ietf-microwave-types:qam-256"
+        }
+      },
+      {
+        "name": "air1",
+        "description": "Air Interface 1",
+        "type": "iana-if-type:wwanPP2",
+        "hardware-component": {
+          "port-layer-if": ["Port2"]
+        },
+        "ietf-microwave-radio-link:tx-frequency": 1000,
+        "ietf-microwave-radio-link:rx-frequency": 1200,
+        "ietf-microwave-radio-link:channel-separation": 10,
+        "ietf-microwave-radio-link:rtpc": {
+          "maximum-nominal-power": "25.0"
+        },
+        "ietf-microwave-radio-link:single": {
+          "selected-cm": "ietf-microwave-types:qam-256"
+        }
+      }
+    ]
+  }
+}

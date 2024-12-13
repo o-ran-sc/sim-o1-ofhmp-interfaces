@@ -1,0 +1,21 @@
+[ req ]
+distinguished_name = req_distinguished_name
+req_extensions = v3_ca
+prompt = no
+
+[ req_distinguished_name ]
+C = US
+ST = New Jersey
+L = New Jersey
+O = Melacon
+OU = 5G
+CN = Root SMO CA
+
+[ v3_ca ]
+subjectAltName = @alt_names
+keyUsage = critical, keyCertSign, cRLSign
+basicConstraints = critical, CA:TRUE
+authorityKeyIdentifier = keyid:always, issuer
+
+[ alt_names ]
+email.1 = smo

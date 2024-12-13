@@ -1,0 +1,356 @@
+module o-ran_3gpp-nr-nrm-nrcelldu {
+  yang-version 1.1;
+  namespace "urn:o-ran:oran-nrcelldu";
+  prefix "or-nrcelldu";
+
+  import _3gpp-common-managed-element {
+    prefix "me3gpp";
+  }
+
+  import _3gpp-nr-nrm-gnbdufunction {
+    prefix "gnbdu3gpp";
+  }
+
+  import _3gpp-nr-nrm-nrcelldu {
+    prefix "nrcelldu3gpp";
+  }
+
+  import o-ran-hardware {
+    prefix "o-ran-hw";
+  }
+
+  import ietf-hardware {
+    prefix hw;
+  }
+
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the augmentation of the SA5 yang data model (_3gpp-nr-nrm-nrcelldu.yang) for configuring O-RAN configuration parameters for O-DU. Configuraion Parameters per cell are included.
+
+    Copyright 2020 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2020-09-25" {
+    description
+      "version 1.0.0 - first release of O-RAN O1 for O-DU YANG models";
+
+    reference "ORAN-WG5.MP.0-v01.00";
+  }
+
+grouping frequency-band-list-group {
+          list freqency-band-list {
+            key id;
+            leaf id {
+              type uint8 {
+                range 1..32;
+            }
+            description "id for freqency-band-list";
+          }
+            leaf nr-frquency-band {
+              type uint16 { range "1 .. 1024"; }
+              mandatory true;
+              description "Operating Band as defined in TS 38.104 [17] section 5.4.2.3.
+                           The value 1 corresponds to NR operating band n1, value 2 corresponds to NR operating band n2, etc.";
+              reference "3GPP TS 38.473";
+            }
+            description "List for freqency-band";
+          }
+          description "Grouping for frequency-band-list";
+        }
+
+        grouping scs-specific-carrier-list-group {
+          list scs-specific-carrier-list {
+            key id;
+            leaf id {
+              type uint8 {
+                range 1..5;
+            }
+            description "id for scs-specific-carrier-list";
+          }
+            leaf offset-to-carrier {
+              type uint16 {
+                range "0 .. 2199";
+            }
+              mandatory true;
+              description "Offset in frequency domain between Point A (lowest subcarrier of common RB 0) and the lowest usable subcarrier on this carrier in number of PRBs (using the subcarrierSpacing defined for this carrier). The maximum value corresponds to 275*8-1. See TS 38.211 [16], clause 4.4.2.";
+              reference "3GPP TS 38.331";
+            }
+
+            leaf subcarrier-spacing {
+              type enumeration {
+                enum kHz15;
+                enum kHz30;
+                enum kHz60;
+                enum kHz120;
+                enum kHz240;
+              }
+              mandatory true;
+              description "Subcarrier spacing of this carrier. It is used to convert the offsetToCarrier into an actual frequency. Only the values 15 kHz, 30 kHz or 60 kHz (FR1), and 60 kHz or 120 kHz (FR2) are applicable.";
+              reference "3GPP TS 38.331";
+            }
+
+            leaf carrier-bandwidth {
+              type uint16 {
+                range "1 .. 275";
+              }
+              mandatory true;
+              description "Width of this carrier in number of PRBs (using the subcarrierSpacing defined for this carrier) (see TS 38.211 [16], clause 4.4.2).";
+              reference "3GPP TS 38.331";
+            }
+            description "List for scs-specific-carrier";
+            }
+            description "Grouping for scs-specific-carrier-list";
+          }
+
+grouping pattern-group {
+  leaf dl-ul-transmission-periodicity {
+    type enumeration {
+      enum ms0p5;
+      enum ms0p625;
+      enum ms1;
+      enum ms1p25;
+      enum ms2;
+      enum ms2p5;
+      enum ms5;
+      enum ms10;
+    }
+    mandatory true;
+    description "Periodicity of the DL-UL pattern, see TS 38.213 [13], clause 11.1. If the dl-UL-TransmissionPeriodicity-v1530 is signalled, UE shall ignore the dl-UL-TransmissionPeriodicity (without suffix).";
+    reference "3GPP TS 38.331";
+  }
+
+  leaf nr-of-downlink-slots {
+    type uint16 {
+      range "0 .. 320";
+    }
+    mandatory true;
+    description "Number of consecutive full DL slots at the beginning of each DL-UL pattern, see TS 38.213 [13], clause 11.1. In this release, the maximum value for this field is 80.";
+    reference "3GPP TS 38.331";
+  }
+
+  leaf nr-of-downlink-symbols {
+    type uint8 {
+      range "0 .. 13";
+    }
+    mandatory true;
+    description "Number of consecutive DL symbols in the beginning of the slot following the last full DL slot (as derived from nrofDownlinkSlots). The value 0 indicates that there is no partial-downlink slot. (see TS 38.213 [13], clause 11.1).";
+    reference "3GPP TS 38.331";
+  }
+
+  leaf nr-of-uplink-slots {
+    type uint16 {
+      range "0 .. 320";
+    }
+    mandatory true;
+    description "Number of consecutive full UL slots at the end of each DL-UL pattern, see TS 38.213 [13], clause 11.1. In this release, the maximum value for this field is 80.";
+    reference "3GPP TS 38.331";
+  }
+
+  leaf nr-of-uplink-symbols {
+    type uint16 {
+      range "0 .. 13";
+    }
+    mandatory true;
+    description "Number of consecutive UL symbols in the end of the slot preceding the first full UL slot (as derived from nrofUplinkSlots). The value 0 indicates that there is no partial-uplink slot. (see TS 38.213 [13], clause 11.1).";
+    reference "3GPP TS 38.331";
+  }
+
+  leaf dl-ul-transmission-periodicity-v1530 {
+    type enumeration {
+      enum ms3;
+      enum ms4;
+  }
+    description "See description of dl-ul-transmission-periodicity";
+    reference "3GPP TS 38.331";
+  }
+  description "Grouping for pattern-group";
+}
+
+
+grouping cell-configuration-group {
+container cell-configuration {
+    leaf configured-eps-tac {
+      type string;
+      description "This information element is used to identify a configured EPS Tracking Area Code in order to enable application of Roaming and Access Restrictions for EN-DC as specified in TS 37.340 [7]. This IE is configured for the cell, but not broadcast.";
+      reference "3GPP TS 38.473";
+    }
+
+    choice duplex-mode {
+      case fdd-list {
+        container ul-freq-info {
+          uses frequency-band-list-group;
+          uses scs-specific-carrier-list-group;
+          leaf p-max {
+            type int8 {
+              range "-30 .. 33";
+            }
+            description "Maximum transmit power allowed in this serving cell. The maximum transmit power that the UE may use on this serving cell may be additionally limited by p-NR-FR1 (configured for the cell group) and by p-UE-FR1 (configured total for all serving cells operating on FR1). If absent, the UE applies the maximum power according to TS 38.101-1 [15]. Value in dBm.";
+            reference "3GPP TS 38.331";
+          }
+          description "Container for ul-freq-info";
+        }
+        container dl-freq-info {
+          uses frequency-band-list-group;
+          uses scs-specific-carrier-list-group;
+          description "Container for dl-freq-info";
+        }
+        description "fdd-list";
+      }
+
+      case tdd-list {
+        uses frequency-band-list-group;
+        container pattern1-list {
+        uses pattern-group;
+        description "Container for pattern1-list";
+      }
+        container pattern2-list {
+        uses pattern-group;
+        description "Container for pattern2-list";
+      }
+      }
+      description "Selection of Duplex mode (fdd List or tdd List) ";
+    }
+
+    container gap-config {
+      leaf gap-offset {
+        type uint8 {
+          range "0 .. 159 ";
+        }
+        description "The gap offset of the gap pattern with MGRP indicated in the field mgrp. The value range should be from 0 to mgrp-1";
+        reference "3GPP TS 38.331";
+      }
+
+      leaf mgl {
+        type enumeration {
+          enum ms1dot5;
+          enum ms3;
+          enum ms3dot5;
+          enum ms4;
+          enum ms5dot5;
+          enum ms6;
+      }
+      description "The measurement gap length in ms of the measurement gap.";
+      reference "3GPP TS 38.331";
+    }
+
+    leaf mgrp {
+      type enumeration {
+        enum ms20;
+        enum ms40;
+        enum ms80;
+        enum ms160;
+    }
+      description "Measurement gap repetition period in (ms) of the measurement gap";
+      reference "3GPP TS 38.331";
+  }
+
+  leaf mgta {
+    type enumeration {
+      enum ms0;
+      enum ms0dot25;
+      enum ms0dot5;
+  }
+      description "The measurement gap timing advance in ms.";
+      reference "3GPP TS 38.331";
+}
+description "Container for gap-config";
+  }
+  description "Conatiner for cell-configuration";
+}
+description "Grouping for cell-configuration";
+}
+
+grouping mib-configuration-group {
+container mib-configuration {
+  leaf control-resource-set-zero {
+    type uint8 {
+      range "0 .. 15";
+    }
+    mandatory true;
+    description "Parameters of the common CORESET#0 which can be used in any common or UE-specific search spaces. The values are interpreted like the corresponding bits in MIB pdcch-ConfigSIB1. Even though this field is only configured in the initial BWP (BWP#0) controlResourceSetZero can be used in search spaces configured in other DL BWP(s) than the initial DL BWP if the conditions defined in TS 38.213 [13], clause 10 are satisfied.";
+    reference "3GPP TS 38.331";
+  }
+  leaf search-space-zero {
+    type uint8 {
+      range "0 .. 15";
+    }
+    mandatory true;
+    description "Parameters of the common SearchSpace#0. The values are interpreted like the corresponding bits in MIB pdcch-ConfigSIB1. Even though this field is only configured in the initial BWP (BWP#0), searchSpaceZero can be used in search spaces configured in other DL BWP(s) than the initial DL BWP if the conditions described in TS 38.213 [13], clause 10, are satisfied.";
+    reference "3GPP TS 38.331";
+  }
+  description "Groupong for mib-configuration";
+}
+description "Grouping for mib-configuration";
+}
+
+grouping mac-configuration-group {
+container mac-configuration {
+      leaf skip-uplink-tx-dynamic {
+      type boolean;
+      mandatory true;
+      description "If set to true, the UE skips UL transmission for an uplink grant other than a configured uplink grant if no data is available for transmission in the UE buffer.";
+    }
+
+    leaf max-harq-msg3-tx {
+      type uint8 {
+        range 1..8;
+      }
+      mandatory true;
+      description "Maximum number of Msg3transmissions";
+    }
+
+    leaf cell-size {
+      type enumeration {
+        enum large;
+        enum middle;
+        enum small;
+        enum very-small;
+      }
+      mandatory true;
+      description "Indicate the Cell size of every cell.";
+    }
+    description "Container for mac-configuration";
+}
+description "Grouping for mac-configuration";
+}
+
+augment "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/nrcelldu3gpp:NRCellDU/nrcelldu3gpp:attributes" {
+  when "(derived-from-or-self(/hw:hardware/hw:component/hw:class, 'o-ran-hw:O-DU-COMPONENT'))";
+  container  o-ran-configuration {
+    uses cell-configuration-group;
+    uses mib-configuration-group;
+    uses mac-configuration-group;
+    description "Container for o-ran-configuration";
+  }
+  description "This module augments _3gpp-nr-nrm-nrcelldu.yang for adding O-RAN original configuration parameters";
+}
+
+}

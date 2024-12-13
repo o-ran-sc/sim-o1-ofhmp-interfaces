@@ -1,0 +1,921 @@
+module o-ran-rlc{
+  yang-version 1.1;
+  namespace "urn:o-ran:rlc:1.0";
+  prefix "o-ran-rlc";
+  
+  import _3gpp-common-managed-element {
+    prefix "me3gpp";
+  }
+
+  import _3gpp-nr-nrm-gnbdufunction {
+    prefix "gnbdu3gpp";
+  }
+  
+  import ietf-hardware {
+    prefix hw;
+  }
+  
+  import o-ran-hardware {
+    prefix o-ran-hw;
+    // TODO AS removed revision
+    // revision-date "2020-04-17";
+  }
+  
+  organization 
+  "O-RAN Alliance";
+
+contact
+  "www.o-ran.org";
+
+description 
+  "This module defines the YANG definitions for O-DU RLC module
+
+   Copyright 2020 the O-RAN Alliance.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+   POSSIBILITY OF SUCH DAMAGE.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+
+   * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the above disclaimer.
+   * Redistributions in binary form must reproduce the above copyright notice,
+     this list of conditions and the above disclaimer in the documentation
+     and/or other materials provided with the distribution.
+   * Neither the Members of the o-RAN Alliance nor the names of its
+     contributors may be used to endorse or promote products derived from
+     this software without specific prior written permission.";
+
+  revision "2020-09-25" {
+    description
+      "version 1.0.0 - first release of O-RAN O1 for O-DU YANG models";
+
+    reference "ORAN-WG5.MP.0-v01.00";
+  }
+  
+  typedef poll-retransmit-time {
+    type enumeration {
+      enum MS5 {
+        description "5 milliseconds";
+      }
+      enum MS10 {
+        description "10 milliseconds";
+      }
+      enum MS15 {
+        description "15 milliseconds";
+      }
+      enum MS20 {
+        description "20 milliseconds";
+      }
+      enum MS25 {
+        description "25 milliseconds";
+      }
+      enum MS30 {
+        description "30 milliseconds";
+      }
+      enum MS35 {
+        description "35 milliseconds";
+      }
+      enum MS40 {
+        description "40 milliseconds";
+      }
+      enum MS45 {
+        description "45 milliseconds";
+      }
+      enum MS50 {
+        description "50 milliseconds";
+      }
+      enum MS55 {
+        description "55 milliseconds";
+      }
+      enum MS60 {
+        description "60 milliseconds";
+      }
+      enum MS65 {
+        description "65 milliseconds";
+      }
+      enum MS70 {
+        description "70 milliseconds";
+      }
+      enum MS75 {
+        description "75 milliseconds";
+      }
+      enum MS80 {
+        description "80 milliseconds";
+      }
+      enum MS85 {
+        description "85 milliseconds";
+      }
+      enum MS90 {
+        description "90 milliseconds";
+      }
+      enum MS95 {
+        description "95 milliseconds";
+      }
+      enum MS100 {
+        description "100 milliseconds";
+      }
+      enum MS105 {
+        description "105 milliseconds";
+      }
+      enum MS110 {
+        description "110 milliseconds";
+      }
+      enum MS115 {
+        description "115 milliseconds";
+      }
+      enum MS120 {
+        description "120 milliseconds";
+      }
+      enum MS125 {
+        description "125 milliseconds";
+      }
+      enum MS130 {
+        description "130 milliseconds";
+      }
+      enum MS135 {
+        description "135 milliseconds";
+      }
+      enum MS140 {
+        description "140 milliseconds";
+      }
+      enum MS145 {
+        description "145 milliseconds";
+      }
+      enum MS150 {
+        description "150 milliseconds";
+      }
+      enum MS155 {
+        description "155 milliseconds";
+      }
+      enum MS160 {
+        description "160 milliseconds";
+      }
+      enum MS165 {
+        description "165 milliseconds";
+      }
+      enum MS170 {
+        description "170 milliseconds";
+      }
+      enum MS175 {
+        description "175 milliseconds";
+      }
+      enum MS180 {
+        description "180 milliseconds";
+      }
+      enum MS185 {
+        description "185 milliseconds";
+      }
+      enum MS190 {
+        description "190 milliseconds";
+      }
+      enum MS195 {
+        description "195 milliseconds";
+      }
+      enum MS200 {
+        description "200 milliseconds";
+      }
+      enum MS205 {
+        description "205 milliseconds";
+      }
+      enum MS210 {
+        description "210 milliseconds";
+      }
+      enum MS215 {
+        description "215 milliseconds";
+      }
+      enum MS220 {
+        description "220 milliseconds";
+      }
+      enum MS225 {
+        description "225 milliseconds";
+      }
+      enum MS230 {
+        description "230 milliseconds";
+      }
+      enum MS235 {
+        description "235 milliseconds";
+      }
+      enum MS240 {
+        description "240 milliseconds";
+      }
+      enum MS245 {
+        description "245 milliseconds";
+      }
+      enum MS250 {
+        description "250 milliseconds";
+      }
+      enum MS300 {
+        description "300 milliseconds";
+      }
+      enum MS350 {
+        description "350 milliseconds";
+      }
+      enum MS400 {
+        description "400 milliseconds";
+      }
+      enum MS450 {
+        description "450 milliseconds";
+      }
+      enum MS500 {
+        description "500 milliseconds";
+      }
+      enum MS800 {
+        description "800 milliseconds";
+      }
+      enum MS1000 {
+        description "1000 milliseconds";
+      }
+      enum MS2000 {
+        description "2000 milliseconds";
+      }
+      enum MS4000 {
+        description "4000 milliseconds";
+      }
+    }
+    description "type definition for RLC poll-retransmit-timer";
+  }    
+
+  typedef status-prohibit-time {
+    type enumeration {
+      enum MS0 {
+        description "0 milliseconds";
+      }
+      enum MS5 {
+        description "5 milliseconds";
+      }
+      enum MS10 {
+        description "10 milliseconds";
+      }
+      enum MS15 {
+        description "15 milliseconds";
+      }
+      enum MS20 {
+        description "20 milliseconds";
+      }
+      enum MS25 {
+        description "25 milliseconds";
+      }
+      enum MS30 {
+        description "30 milliseconds";
+      }
+      enum MS35 {
+        description "35 milliseconds";
+      }
+      enum MS40 {
+        description "40 milliseconds";
+      }
+      enum MS45 {
+        description "45 milliseconds";
+      }
+      enum MS50 {
+        description "50 milliseconds";
+      }
+      enum MS55 {
+        description "55 milliseconds";
+      }
+      enum MS60 {
+        description "60 milliseconds";
+      }
+      enum MS65 {
+        description "65 milliseconds";
+      }
+      enum MS70 {
+        description "70 milliseconds";
+      }
+      enum MS75 {
+        description "75 milliseconds";
+      }
+      enum MS80 {
+        description "80 milliseconds";
+      }
+      enum MS85 {
+        description "85 milliseconds";
+      }
+      enum MS90 {
+        description "90 milliseconds";
+      }
+      enum MS95 {
+        description "95 milliseconds";
+      }
+      enum MS100 {
+        description "100 milliseconds";
+      }
+      enum MS105 {
+        description "105 milliseconds";
+      }
+      enum MS110 {
+        description "110 milliseconds";
+      }
+      enum MS115 {
+        description "115 milliseconds";
+      }
+      enum MS120 {
+        description "120 milliseconds";
+      }
+      enum MS125 {
+        description "125 milliseconds";
+      }
+      enum MS130 {
+        description "130 milliseconds";
+      }
+      enum MS135 {
+        description "135 milliseconds";
+      }
+      enum MS140 {
+        description "140 milliseconds";
+      }
+      enum MS145 {
+        description "145 milliseconds";
+      }
+      enum MS150 {
+        description "150 milliseconds";
+      }
+      enum MS155 {
+        description "155 milliseconds";
+      }
+      enum MS160 {
+        description "160 milliseconds";
+      }
+      enum MS165 {
+        description "165 milliseconds";
+      }
+      enum MS170 {
+        description "170 milliseconds";
+      }
+      enum MS175 {
+        description "175 milliseconds";
+      }
+      enum MS180 {
+        description "180 milliseconds";
+      }
+      enum MS185 {
+        description "185 milliseconds";
+      }
+      enum MS190 {
+        description "190 milliseconds";
+      }
+      enum MS195 {
+        description "195 milliseconds";
+      }
+      enum MS200 {
+        description "200 milliseconds";
+      }
+      enum MS205 {
+        description "205 milliseconds";
+      }
+      enum MS210 {
+        description "210 milliseconds";
+      }
+      enum MS215 {
+        description "215 milliseconds";
+      }
+      enum MS220 {
+        description "220 milliseconds";
+      }
+      enum MS225 {
+        description "225 milliseconds";
+      }
+      enum MS230 {
+        description "230 milliseconds";
+      }
+      enum MS235 {
+        description "235 milliseconds";
+      }
+      enum MS240 {
+        description "240 milliseconds";
+      }
+      enum MS245 {
+        description "245 milliseconds";
+      }
+      enum MS250 {
+        description "250 milliseconds";
+      }
+      enum MS300 {
+        description "300 milliseconds";
+      }
+      enum MS350 {
+        description "350 milliseconds";
+      }
+      enum MS400 {
+        description "400 milliseconds";
+      }
+      enum MS450 {
+        description "450 milliseconds";
+      }
+      enum MS500 {
+        description "500 milliseconds";
+      }
+      enum MS800 {
+        description "800 milliseconds";
+      }
+      enum MS1000 {
+        description "1000 milliseconds";
+      }
+      enum MS1200 {
+        description "1200 milliseconds";
+      }
+      enum MS1600 {
+        description "1600 milliseconds";
+      }
+      enum MS2000 {
+        description "2000 milliseconds";
+      }
+      enum MS2400 {
+        description "2400 milliseconds";
+      }
+    }
+    description "type definition for RLC status-prohibit-timer";
+  }
+  
+  typedef reassembly-time {
+    type enumeration {
+      enum MS0 {
+        description "0 milliseconds";
+      }
+      enum MS5 {
+        description "5 milliseconds";
+      }
+      enum MS10 {
+        description "10 milliseconds";
+      }
+      enum MS15 {
+        description "15 milliseconds";
+      }
+      enum MS20 {
+        description "20 milliseconds";
+      }
+      enum MS25 {
+        description "25 milliseconds";
+      }
+      enum MS30 {
+        description "30 milliseconds";
+      }
+      enum MS35 {
+        description "35 milliseconds";
+      }
+      enum MS40 {
+        description "40 milliseconds";
+      }
+      enum MS45 {
+        description "45 milliseconds";
+      }
+      enum MS50 {
+        description "50 milliseconds";
+      }
+      enum MS55 {
+        description "55 milliseconds";
+      }
+      enum MS60 {
+        description "60 milliseconds";
+      }
+      enum MS65 {
+        description "65 milliseconds";
+      }
+      enum MS70 {
+        description "70 milliseconds";
+      }
+      enum MS75 {
+        description "75 milliseconds";
+      }
+      enum MS80 {
+        description "80 milliseconds";
+      }
+      enum MS85 {
+        description "85 milliseconds";
+      }
+      enum MS90 {
+        description "90 milliseconds";
+      }
+      enum MS95 {
+        description "95 milliseconds";
+      }
+      enum MS100 {
+        description "100 milliseconds";
+      }
+      enum MS110 {
+        description "110 milliseconds";
+      }
+      enum MS120 {
+        description "120 milliseconds";
+      }
+      enum MS130 {
+        description "130 milliseconds";
+      }
+      enum MS140 {
+        description "140 milliseconds";
+      }
+      enum MS150 {
+        description "150 milliseconds";
+      }
+      enum MS160 {
+        description "160 milliseconds";
+      }
+      enum MS170 {
+        description "170 milliseconds";
+      }
+      enum MS180 {
+        description "180 milliseconds";
+      }
+      enum MS190 {
+        description "190 milliseconds";
+      }
+      enum MS200 {
+        description "200 milliseconds";
+      }
+    }
+    description "type definition for RLC reassembly-timer";
+  }
+  
+  typedef num-poll-pdu {
+    type enumeration {
+      enum P4 {
+        description "PDU";
+      }
+      enum P8 {
+        description "8 PDU";
+      }
+      enum P16 {
+        description "16 PDU";
+      }
+      enum P32 {
+        description "32 PDU";
+      }
+      enum P64 {
+        description "64 PDU";
+      }
+      enum P128 {
+        description "128 PDU";
+      }
+      enum P256 {
+        description "256 PDU";
+      }
+      enum P512 {
+        description "512 PDU";
+      }
+      enum P1024 {
+        description "1024 PDU";
+      }
+      enum P2048 {
+        description "2048 PDU";
+      }
+      enum P4096 {
+        description "4096 PDU";
+      }
+      enum P6144 {
+        description "6144 PDU";
+      }
+      enum P8192 {
+        description "8192 PDU";
+      }
+      enum P12288 {
+        description "12288 PDU";
+      }
+      enum P16384 {
+        description "16384 PDU";
+      }
+      enum P20480 {
+        description "20480 PDU";
+      }
+      enum P24576 {
+        description "24576 PDU";
+      }
+      enum P28672 {
+        description "28672 PDU";
+      }
+      enum P32768 {
+        description "32768 PDU";
+      }
+      enum P40960 {
+        description "40960 PDU";
+      }
+      enum P49152 {
+        description "49152 PDU";
+      }
+      enum P57344 {
+        description "57344 PDU";
+      }
+      enum P65536 {
+        description "65536 PDU";
+      }
+      enum INFINITY {
+        description "infinity";
+      }
+    }
+    description "type definition for RLC poll-pdu";
+  }
+  typedef num-poll-bytes  {
+    type enumeration {
+      enum KB1 {
+        description "1 kByte";
+      }
+      enum  KB2 {
+        description "2 kBytes";
+      }
+      enum  KB5 {
+        description "5 kBytes";
+      }
+      enum  KB8 {
+        description "8 kBytes";
+      }
+      enum  KB10 {
+        description "10 kBytes";
+      }
+      enum  KB15 {
+        description "15 kBytes";
+      }
+      enum  KB25 {
+        description "25 kBytes";
+      }
+      enum  KB50 {
+        description "50 kBytes";
+      }
+      enum  KB75 {
+        description "75 kBytes";
+      }
+      enum  KB100 {
+        description "100 kBytes";
+      }
+      enum  KB125 {
+        description "125 kBytes";
+      }
+      enum  KB250 {
+        description "250 kBytes";
+      }
+      enum  KB375 {
+        description "375 kBytes";
+      }
+      enum  KB500 {
+        description "500 kBytes";
+      }
+      enum  KB750 {
+        description "750 kBytes";
+      }
+      enum  KB1000 {
+        description "1000 kBytes";
+      }
+      enum  KB1250 {
+        description "1250 kBytes";
+      }
+      enum  KB1500 {
+        description "1500 kBytes";
+      }
+      enum  KB2000 {
+        description "2000 kBytes";
+      }
+      enum  KB3000 {
+        description "3000 kBytes";
+      }
+      enum  KB4000 {
+        description "4000 kBytes";
+      }
+      enum  KB4500 {
+        description "4500 kBytes";
+      }
+      enum  KB5000 {
+        description "5000 kBytes";
+      }
+      enum  KB5500 {
+        description "5500 kBytes";
+      }
+      enum  KB6000 {
+        description "6000 kBytes";
+      }
+      enum  KB6500 {
+        description "6500 kBytes";
+      }
+      enum  KB7000 {
+        description "7000 kBytes";
+      }
+      enum  KB7500 {
+        description "7500 kBytes";
+      }
+      enum  MB8 {
+        description "8 mBytes";
+      }
+      enum  MB9 {
+        description "9 mBytes";
+      }
+      enum  MB10 {
+        description "10 mBytes";
+      }
+      enum  MB11 {
+        description "11 mBytes";
+      }
+      enum  MB12 {
+        description "12 mBytes";
+      }
+      enum  MB13 {
+        description "13 mBytes";
+      }
+      enum  MB14 {
+        description "14 mBytes";
+      }
+      enum  MB15 {
+        description "15 mBytes";
+      }
+      enum  MB16 {
+        description "16 mBytes";
+      }
+      enum  MB17 {
+        description "17 mBytes";
+      }
+      enum  MB18 {
+        description "18 mBytes";
+      }
+      enum  MB20 {
+        description "20 mBytes";
+      }
+      enum  MB25 {
+        description "25 mBytes";
+      }
+      enum  MB30 {
+        description "30 mBytes";
+      }
+      enum  MB40 {
+        description "40 mBytes";
+      }
+      enum  INFINITY {
+        description "infinity";
+      }
+    }
+    description "type definition for RLC poll-bytes";
+  }
+  
+  typedef num-max-retx  {
+    type enumeration {
+      enum T1 {
+        description "1 retransmission";
+      }
+      enum T2 {
+        description "2 retransmissions";
+      }
+      enum T3 {
+        description "3 retransmissions";
+      }
+      enum T4 {
+        description "4 retransmissions";
+      }
+      enum T6 {
+        description "6 retransmissions";
+      }
+      enum T8 {
+        description "8 retransmissions";
+      }
+      enum T16 {
+        description "16 retransmissions";
+      }
+      enum T32 {
+        description "32 retransmissions";
+      }
+    }
+    description "type definition for RLC max-retx";
+  }
+  
+  typedef am-sn-field-lengths {
+    type enumeration {
+      enum SIZE12 {
+        description "12-bit SN field";
+      }
+      enum SIZE18 {
+        description "18-bit SN field";
+      }
+    }
+    description "type definition for sn-field-length-am";
+  }
+  typedef um-sn-field-lengths {
+    type enumeration {
+      enum SIZE6 {
+        description "6-bit SN field";
+      }
+      enum SIZE12 {
+        description "12-bit SN field";
+      }
+    }
+    description "type definition for sn-field-length-um";
+  }
+  
+  
+  grouping rlc-config-param-grouping {
+    description "grouping of RLC config parameters";
+    leaf t-poll-retransmit {
+      type poll-retransmit-time;
+      mandatory true;
+      description "poll retransmit timer for RLC-AM. TS 38.331";
+    }
+    leaf poll-pdu {
+      type num-poll-pdu;
+      mandatory true;
+      description "num poll pdu for RLC-AM. TS 38.331";
+    }
+    leaf poll-byte {
+      type num-poll-bytes;
+      mandatory true;
+      description "num poll bytes for RLC-AM. TS 38.331";
+    }
+    leaf max-retx-threshold {
+      type num-max-retx;
+      mandatory true;
+      description "num max retx for RLC-AM. TS 38.331";
+    }
+    leaf t-reassembly {
+      type reassembly-time;
+      mandatory true;
+      description "reassembly timer for RLC-AM. TS 38.331";
+    }
+    leaf t-status-prohibit {
+      type status-prohibit-time;
+      mandatory true;
+      description "status-prohibit timer for RLC-AM. TS 38.331";
+    }
+  }
+
+  grouping sn-field-length-grouping {
+    description "grouping of AM and UM SN field length parameters";
+    leaf sn-field-length-am {
+      type am-sn-field-lengths;
+      mandatory true;
+      description "sn field length for AM";
+    }
+    leaf sn-field-length-um {
+      type um-sn-field-lengths;
+      mandatory true;
+      description "sn field length for UM";
+    }
+  }
+  
+  grouping ue-config-rlc-param-grouping {
+    description "grouping of UE RLC config parameters";
+    container ue-config-rlc-param-list {
+        description "container for UE RLC config parameters";
+        uses rlc-config-param-grouping;
+      }
+  }
+  grouping gnb-du-config-rlc-param-grouping {
+    description "grouping of DU RLC config parameters";
+    container gnb-du-config-rlc-param-list {
+        description "container for DU RLC config parameters";
+        uses rlc-config-param-grouping;
+      }
+  }
+  
+ grouping rlc-config-group {
+    description "grouping of RLC config parameters";
+    container rlc-config {
+      description "Container for RLC config parameters";
+      container srb-config-list {
+        description "container for SRB RLC config parameters";
+        uses ue-config-rlc-param-grouping;
+        uses gnb-du-config-rlc-param-grouping;
+      }
+      list qos-group-config-list {
+        key "qos-group-index";
+          min-elements 1;
+          description "list of RLC config per QoS group";        
+          leaf qos-group-index {
+            type uint8 {
+              range "1..32";
+             }
+            description "qos group index";
+          }
+          container common-config-rlc-param-list {
+            description "container for RLC config parameters common for DU and UE";
+            container ul-sn-field-lengths {
+              description "container for UL SN field lengths";
+              uses sn-field-length-grouping;
+            }
+            container dl-sn-field-lengths {
+              description "container for DL SN field lengths";
+              uses sn-field-length-grouping;
+            }
+          }
+          uses ue-config-rlc-param-grouping;
+          uses gnb-du-config-rlc-param-grouping;      
+      }
+    }
+  }
+  
+  augment "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/gnbdu3gpp:attributes" {
+    when "(derived-from-or-self(/hw:hardware/hw:component/hw:class, 'o-ran-hw:O-DU-COMPONENT'))";
+    uses rlc-config-group;
+    description "SA5 gNB DU function augmented with RLC configuration";
+  }
+}  
+   
+      
+  
+    
+      
+  
+ 
+  

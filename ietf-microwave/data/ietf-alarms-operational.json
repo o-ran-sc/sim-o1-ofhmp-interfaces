@@ -1,0 +1,38 @@
+{
+    "ietf-alarms:alarms": {
+        "alarm-list": {
+            "number-of-alarms": 2,
+            "last-changed": "2024-05-11T11:22:33Z",
+            "alarm": [
+                {
+                    "resource": "testResource1",
+                    "alarm-type-id": "bbf-alarm-types:bbf-security-alarm-type-id",
+                    "alarm-type-qualifier": "testAlarmTypeIdUnknown1",
+
+                    "is-cleared": false,
+                    "perceived-severity": "major",
+
+                    "time-created": "2024-05-11T11:22:30Z",
+                    "last-raised": "2024-05-11T11:22:33Z",
+                    "last-changed": "2024-05-11T11:22:33Z",
+
+                    "alarm-text": "alarma 1"
+                },
+                {
+                    "resource": "testResource2",
+                    "alarm-type-id": "bbf-alarm-types:bbf-security-alarm-type-id",
+                    "alarm-type-qualifier": "testAlarmTypeIdUnknown2",
+
+                    "is-cleared": false,
+                    "perceived-severity": "minor",
+
+                    "time-created": "2024-05-12T11:22:30Z",
+                    "last-raised": "2024-05-12T11:22:30Z",
+                    "last-changed": "2024-05-12T11:22:30Z",
+
+                    "alarm-text": "alarma 2"
+                }
+            ]
+        }
+    }
+}

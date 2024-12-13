@@ -1,0 +1,22 @@
+<users xmlns="urn:o-ran:user-mgmt:1.0">
+    <user>
+      <name>oranuser</name>
+      <enabled>true</enabled>
+    </user>
+    <user>
+      <name>sudo</name>
+      <enabled>true</enabled>
+    </user>
+    <user>
+      <name>smo</name>
+      <enabled>true</enabled>
+    </user>
+    <user>
+      <name>hybrid-odu</name>
+      <enabled>true</enabled>
+    </user>
+    <user>
+      <name>carrier</name>
+      <enabled>true</enabled>
+    </user>
+</users>

@@ -1,0 +1,307 @@
+module o-ran-cti-common {
+  yang-version 1.1;
+  namespace "urn:o-ran:cti-common:2.0";
+  prefix "or-ctic";
+
+  import ietf-yang-types {
+    prefix yang;
+  }
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import ietf-ip {
+    prefix ip;
+  }
+
+  import ietf-interfaces {
+    prefix if;
+  }
+
+  import o-ran-common-yang-types {
+    prefix or-types;
+  }
+
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the common groupings used by configuration management
+    model for the O-RAN WG4 Cooperative Transport Interface.
+
+    Note - this module comprises a number of re-usable groupings.
+    It has been designed to be agnostic to model specific 'style-guides' used by
+    the 'importing models', enabling the groupings to be incorporated into models
+    defined externally to O-RAN Alliance (e.g., BBF and CableLabs) as well as
+    incorporated into O-RAN alliance defined models.
+
+    Copyright 2023 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2023-03-17" {
+    description
+      "version 4.0.0
+
+      Update to IM as per CTI TMP v4";
+
+    reference "ORAN-WG4.CTI-TMP.0-v04.00";
+  }
+
+  revision "2022-04-15" {
+    description
+      "version 3.0.0
+
+      1) non-backward compatible changes to switch to camelCase";
+
+    reference "ORAN-WG4.CTI-TMP.0-v03.00";
+  }
+
+  typedef ethertype {
+    type uint16;
+    description
+      "An ethertype value";
+  }
+
+  typedef ctiVersion {
+    type uint8 {
+      range "0..15";
+    }
+    description
+      "The version of CTI TC-Plane or TM-Plane.";
+  }
+
+  typedef localIpv4OrIpv6 {
+    type union {
+      type leafref {
+        path "/if:interfaces/if:interface/ip:ipv4/ip:address/ip:ip";
+      }
+      type leafref {
+        path "/if:interfaces/if:interface/ip:ipv6/ip:address/ip:ip";
+      }
+    }
+    description "Local IPv4 or IPv6 address for CTI Server";
+  }
+
+  grouping ctiTimersGrp {
+    description "a grouping for CTI timers";
+    leaf ctiKa {
+      type uint8;
+      units 0.1-seconds;
+//    RFC 8407 top level container comment is removed
+      mandatory true;
+      description
+        "This value, abbreviated as ctiKa, is the maximum time interval between consecutive
+        CTI-Keep-Alive messages between the CTI client and the CTI server. Example value is 30.";
+    }
+    leaf ctiTo {
+      type uint8;
+      units 0.1-seconds;
+//    RFC 8407 top level container comment is removed
+      mandatory true;
+      description
+        "This value, abbreviated as ctiTo, is the timeout value that a CTI-Beacon-Ack message
+        needs to be received by the CTI client (O-DU) or the CTI server (transport system)
+        before that respective system suspends CTI operations and returns to its CTI configuration
+        state. Example value is 100.";
+    }
+  }
+
+  grouping ctiPatternGrp {
+    description "a grouping for CTI pattern";
+    leaf patternId {
+      type uint32 {
+        range "0..16777215";
+      }
+      mandatory true;
+      description
+        "An integer representing a 24 bit value that uniquely identifies a CTI pattern.
+        A pattern-id of 0 means all data is spread equally in time, see spec for details";
+    }
+    leaf patternDuration {
+      type uint8;
+      units 125-microseconds;
+      mandatory true;
+      description "The length of a single mobile slot time, in units of 125 micorseconds";
+    }
+    leaf patternEvents {
+      type uint8;
+      mandatory true;
+      description
+        "This is the number of events per pattern. An event is typically a symbol or a
+        group of symbols within a slot. For example, if a slot contained 14 symbols,
+        there could be 14 events with each being one symbol or 7 events with each
+        being 2 symbols";
+    }
+    leaf patternEventMultiplier {
+      type uint8;
+      mandatory true;
+      description
+        "The number of sequential events that have the same byte count. The multipler
+        variable and the byte count variable are repeated as a pair to describe an event";
+    }
+    leaf patternEventBytes {
+      type uint16;
+      mandatory true;
+      description
+        "This is the number of bytes per event. A byte count is allowed to be 0 bytes.
+        A reserved value of 0xFFFF (65535) indicates a residual average, where:
+          Residual average
+        = [ CTI byte count - sum(explicit bytes described) ] /sum(events without explicit bytes described)";
+    }
+    leaf patternNormalization {
+      type boolean;
+      mandatory true;
+      description
+        "Whether or not to normalize the values of pattern-event-bytes
+            so that their sum per reported interval is always the same fixed value";
+    }
+  }
+
+  grouping layer2FilterGrp {
+    description "a grouping for a layer 2 CTI flow filters identifying fronthaul traffic";
+    leaf sourceMac {
+      type yang:mac-address;
+      description "an optional source MAC address filter ";
+    }
+    leaf destinationMac {
+      type yang:mac-address;
+      description "an optional desination MAC address filter";
+    }
+    leaf ethertype {
+      type ethertype;
+      description "an optional ethertype filter";
+    }
+    leaf pcp {
+      type or-types:pcp;
+      description "an optional PCP filter";
+    }
+    leaf vlanId {
+      type or-types:vlan-id;
+      description "an optional vlan id filter";
+    }
+  }
+
+  grouping layer3and4FilterGrp {
+    description "a grouping for L3 and L4 CTI flow filters identifying fronthaul traffic";
+    leaf sourceAddress {
+      type inet:ip-address;
+      description "an optional source IPv4 or IPv6 address filter";
+    }
+    leaf sourcePrefix {
+      type inet:ip-prefix;
+      description "an optional source IPv4 or IPv6 prefix filter - note not mask as in the word doc";
+    }
+    leaf destinationAddress {
+      type inet:ip-address;
+      description "an optional destination IPv4 or IPv6 address filter";
+    }
+    leaf destinationPrefix {
+      type inet:ip-prefix;
+      description "an optional destination IPv4 or IPv6 prefix filter - note not mask as in the word doc";
+    }
+    leaf dscp {
+      type inet:dscp;
+      description "an optional DSCP value filter, for IPv4 or IPv6";
+    }
+    leaf sourcePortStart {
+      type inet:port-number;
+      description
+        "This defines the UDP source port to use on a CTI flow.
+        This can help with classification uniqueness.";
+    }
+    leaf sourcePortEnd {
+      type inet:port-number;
+      must "current()>=../sourcePortStart";
+        description
+        "This defines the UDP source port to use on a CTI flow.
+        This can help with classification uniqueness.";
+    }
+    leaf destinationPortStart {
+      type inet:port-number;
+      description
+        "This defines the UDP destination port to use on a CTI flow.
+        This can help with classification uniqueness.";
+    }
+    leaf destinationPortEnd {
+      type inet:port-number;
+      must "current()>=../destinationPortStart";
+        description
+        "This defines the UDP destination port to use on a CTI flow.
+        This can help with classification uniqueness.";
+    }
+    leaf ipv4Protocol {
+      type uint8;
+      description
+        "This defines the IPv4 protocol field to use on a CTI flow.
+        This can help with classification uniqueness.";
+    }
+    leaf ipv6TrafficClass {
+      type uint8;
+      description
+        "This defines the IPv6 Traffic Class field to use on a CTI flow.
+        This can help with classification uniqueness.";
+    }
+    leaf ipv6Flow {
+      type inet:ipv6-flow-label;
+      description
+        "This defines the IPv6 flow label to use on a CTI flow.
+        This can help with classification uniqueness.";
+    }
+    leaf ipv6NextHeader {
+      type uint8;
+      description
+        "This defines the IPv6 next header field to use on a CTI flow.
+        This can help with classification uniqueness.";
+    }
+  }
+
+  grouping subtypeGrp {
+    description "Grouping for Ethernet Subtype";
+    leaf protocolSubtype {
+      type uint16;
+      default 1;
+      description
+        "the 16-bit sub-type to be used with the standardized O-RAN allocated
+        Ethertype value 0x9433. The default value to be used is 0x1. If another
+        value is needed it can be configured.";
+    }
+  }
+
+  grouping ctiListeningUdpPortGrp {
+    description "Grouping for UDP listening port";
+    leaf ctiListeningUdpPort {
+        type inet:port-number;
+//    RFC 8407 top level container comment is removed
+      mandatory true;
+      description
+        "This defines the UDP destination port to use for all CTI messages.";
+      }
+  }
+}

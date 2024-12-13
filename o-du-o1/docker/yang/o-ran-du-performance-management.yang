@@ -1,0 +1,107 @@
+module o-ran-du-performance-management {
+  yang-version 1.1;
+  namespace "urn:o-ran:du-pm:1.0";
+  prefix "or-du-pm";
+
+  import _3gpp-common-managed-element {
+    prefix "me3gpp";
+  }
+
+  import _3gpp-nr-nrm-gnbdufunction {
+    prefix "gnbdu3gpp";
+  }
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the augmentation of the SA5 yang data model according to 28.623 and 28.541 to include the pm-count-groups information of the O-DU.
+
+    Copyright 2020 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2020-09-25" {
+    description
+      "version 1.0.0 - first release of O-RAN O1 for O-DU YANG models";
+
+    reference "ORAN-WG5.MP.0-v01.00";
+  }
+
+  grouping pm-count-groups {
+
+    list pm-count-list-drb {
+      key "qci-index";
+
+      leaf qci-index {
+        type uint8 {
+          range 0..255;
+        }
+        mandatory true;
+        description
+          "QoS Class Identifier defined in TS 23.401. Logical range and coding specified in TS 23.203.";
+        }
+
+      leaf pm-count-group {
+        type uint8 {
+          range 0..17;
+        }
+        mandatory true;
+        description
+          "Indicates which of the 17 'PmCountGroup' shall be used for this QCI index. Value 0, indicates that this QCI shall NOT be counted. If duplicated several QCI are set to same pm-count-group, they should be counted as same counter.";
+      }
+    }
+
+    list pm-count-list-srb {
+      key "srb-index" ;
+
+      leaf srb-index {
+        type uint8 {
+          range 1..3;
+        }
+        description
+          "Value 1, 2, 3 indicates SRB1S, SRB2S, SRB3, respectively.";
+      }
+
+      leaf pm-count-group {
+        type uint8 {
+          range 0|18..20;
+        }
+        mandatory true;
+        description
+          "Indicates which of the 3 'PmCountGroup' shall be used for this SRB Index. Value 0, indicates that this SRB Index shall NOT be counted. If duplicated several SRB Index are set to same pm-count-group, they should be counted as same counter.";
+      }
+    }
+  }
+
+  augment "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/gnbdu3gpp:attributes" {
+    container pm-count-groups {
+      uses pm-count-groups;
+    }
+  }
+
+}

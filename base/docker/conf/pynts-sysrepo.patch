@@ -1,0 +1,32 @@
+diff --git a/src/modinfo.c b/src/modinfo.c
+index 6dc66452..39c63e4a 100644
+--- a/src/modinfo.c
++++ b/src/modinfo.c
+@@ -3522,7 +3522,7 @@ sr_modinfo_generate_config_change_notif(struct sr_mod_info_s *mod_info, sr_sessi
+     }
+ 
+     /* changed-by username */
+-    if ((err_info = sr_lyd_new_term(root, NULL, "username", session->user))) {
++    if ((err_info = sr_lyd_new_term(root, NULL, "username", (session->nacm_user != NULL) ? session->nacm_user : session->user))) {
+         goto cleanup;
+     }
+ 
+diff --git a/src/utils/subscribed_notifications.c b/src/utils/subscribed_notifications.c
+index a0694d04..16bc448c 100644
+--- a/src/utils/subscribed_notifications.c
++++ b/src/utils/subscribed_notifications.c
+@@ -40,9 +40,13 @@ srsn_filter_subtree2xpath(const struct lyd_node *subtree, sr_session_ctx_t *sess
+     sr_error_info_t *err_info = NULL;
+     struct srsn_filter filter = {0};
+ 
+-    SR_CHECK_ARG_APIRET(!subtree || !xpath_filter, session, err_info);
++    SR_CHECK_ARG_APIRET(!xpath_filter, session, err_info);
+ 
+     *xpath_filter = NULL;
++    if (!subtree) {
++      *xpath_filter = strdup("*[1]");
++      goto cleanup;
++    }
+ 
+     /* create a filter structure first */
+     if ((err_info = srsn_filter_create_subtree(subtree, &filter))) {
