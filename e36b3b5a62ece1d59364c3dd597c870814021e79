@@ -16,6 +16,23 @@
       "message": "@Matt, could you please help here? I am trying to add the INFO.yaml file, but I am getting a verified -1 because INFO.yaml is missing...",
       "revId": "e36b3b5a62ece1d59364c3dd597c870814021e79",
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07acb8ff_93ad1388",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000113
+      },
+      "writtenOn": "2025-01-08T18:42:59Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "e36b3b5a62ece1d59364c3dd597c870814021e79",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     }
   ]
 }
