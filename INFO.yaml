@@ -12,8 +12,8 @@ project_lead: &oran_sim_o1-ofhmp-interfaces_ptl
 primary_contact: *oran_sim_o1-ofhmp-interfaces_ptl
 issue_tracking:
     type: 'jira'
-    url: "https://lf-o-ran-sc.atlassian.net/jira/software/c/\
-          projects/SIM/boards/35/backlog"
+    # yamllint disable-line rule:line-length
+    url: 'https://lf-o-ran-sc.atlassian.net/jira/software/c/projects/SIM/boards/35/backlog'
     key: 'SIM'
 mailing_list:
     type: 'groups.io'
@@ -34,8 +34,6 @@ meetings:
 repositories:
     - 'sim/o1-ofhmp-interfaces'
 committers:
-    - <<: *oran_sim_o1-ofhmp-interfaces_ptl
-tsc:
+    - <<: *oran_sim_o1-ofhmp-interfaces_ptltsc:
     approval: >
-      "https://lf-o-ran-sc.atlassian.net/wiki/spaces/TOC/\
-      overview#O-RANSCTechnicalOversightCommittee(TOC)-20241107"
+      'https://lf-o-ran-sc.atlassian.net/wiki/spaces/TOC/overview#O-RANSCTechnicalOversightCommittee(TOC)-20241107'
