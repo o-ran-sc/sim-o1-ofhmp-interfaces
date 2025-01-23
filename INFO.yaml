@@ -1,19 +1,19 @@
 ---
 project: 'sim/o1-ofhmp-interfaces'
-project_creation_date: '2024-12-13'
+project_creation_date: '2019-08-08'
 project_category: ''
 lifecycle_state: 'Incubation'
-project_lead: &oran_sim_o1-ofhmp-interfaces_ptl
+project_lead: &oran_sim_o1-interface_ptl
     name: 'Alex Stancu'
     email: 'alexandru.stancu@highstreet-technologies.com'
     id: 'alex.stancu'
     company: 'highstreet technologies GmbH'
     timezone: 'Europe/Bucharest'
-primary_contact: *oran_sim_o1-ofhmp-interfaces_ptl
+primary_contact: *oran_sim_o1-interface_ptl
 issue_tracking:
     type: 'jira'
-    url: "https://lf-o-ran-sc.atlassian.net/jira/software/c/\
-          projects/SIM/boards/35/backlog"
+    # yamllint disable-line rule:line-length
+    url: 'https://lf-o-ran-sc.atlassian.net/jira/software/c/projects/SIM/boards/35/backlog'
     key: 'SIM'
 mailing_list:
     type: 'groups.io'
@@ -34,8 +34,7 @@ meetings:
 repositories:
     - 'sim/o1-ofhmp-interfaces'
 committers:
-    - <<: *oran_sim_o1-ofhmp-interfaces_ptl
+    - <<: *oran_sim_o1-interface_ptl
 tsc:
     approval: >
-      "https://lf-o-ran-sc.atlassian.net/wiki/spaces/TOC/\
-      overview#O-RANSCTechnicalOversightCommittee(TOC)-20241107"
+      'https://lf-o-ran-sc.atlassian.net/wiki/spaces/TOC/overview#O-RANSCTechnicalOversightCommittee(TOC)-20241107'
