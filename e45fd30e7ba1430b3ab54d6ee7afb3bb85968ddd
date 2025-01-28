@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "455edcc0_d7e39005",
+        "filename": "INFO.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-28T17:12:02Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be changed",
+      "revId": "e45fd30e7ba1430b3ab54d6ee7afb3bb85968ddd",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c42db649_ab851ac3",
+        "filename": "INFO.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-28T17:12:02Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be changed",
+      "revId": "e45fd30e7ba1430b3ab54d6ee7afb3bb85968ddd",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c18070e_fbceb3e0",
+        "filename": "INFO.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-28T17:12:02Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be changed",
+      "revId": "e45fd30e7ba1430b3ab54d6ee7afb3bb85968ddd",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a4d9cf7_a89cb585",
+        "filename": "INFO.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2025-01-28T17:12:02Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be changed",
+      "revId": "e45fd30e7ba1430b3ab54d6ee7afb3bb85968ddd",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    }
+  ]
+}
