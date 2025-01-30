@@ -7,7 +7,7 @@ project_lead: &oran_sim_o1-ofhmp-interfaces_ptl
     name: 'Alex Stancu'
     email: 'alexandru.stancu@highstreet-technologies.com'
     id: 'alex.stancu'
-    company: 'highstreet technologies GmbH'
+    company: 'highstreet technologies USA Corp.'
     timezone: 'Europe/Bucharest'
 primary_contact: *oran_sim_o1-ofhmp-interfaces_ptl
 issue_tracking:
