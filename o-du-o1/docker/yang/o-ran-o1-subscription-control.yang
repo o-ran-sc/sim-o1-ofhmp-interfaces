@@ -1,0 +1,103 @@
+module o-ran-o1-subscription-control {
+  yang-version 1.1;
+  namespace "urn:o-ran:o1:o-ran-o1-subscription-control";
+  prefix "or-sctrl";
+
+  import _3gpp-common-top { prefix top3gpp; }
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module is for supporting O1 aligned O-RAN subscription control for O-RAN defined notifications.
+
+    Copyright 2021 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision 2021-09-15 {
+    description
+      "Initial version";
+    reference "O-RAN.WG5.MP.0-v01.00" ;
+  }
+
+  identity o1NotificationTypes {
+    description "Base notification for O-RAN defined notification types";
+  }
+
+  identity o1NotifyMeasurementsResultsStats {
+    base "o1NotificationTypes";
+    description "O-RU measurements statistics notification";
+  }
+
+  identity o1NotifyCloudNFRegistration {
+    base "o1NotificationTypes";
+    description "cloudified NF registration notification";
+  }
+
+  grouping OranSubscriptionControlGrp {
+    description "Attributes of a specific notification subscription";
+
+    leaf notificationRecipientAddress {
+      type string;
+      mandatory true;
+      description
+        "Address of receipient of notification.
+         Please refer to TS 28.623";
+    }
+
+    leaf-list notificationTypes {
+      type identityref {
+        base "o1NotificationTypes";
+      }
+      description
+        "Defines the types of O-RAN-specified O1 notifications
+         that are forwarded to the notification recipient.";
+    }
+  }
+
+  grouping OranSubscriptionControlWrapper {
+    description
+      "Grouping for O-RAN subscription control.";
+
+    list OranSubscriptionControl {
+      key id;
+      description
+        "OranSubscriptionControlWrapper is dedicated to
+         O-RAN-specified O1 notifications only and can be set
+         independently of NtfSubscriptionControl from 3GPP.";
+
+      uses top3gpp:Top_Grp;
+      container attributes {
+        description
+          "Container for attributes of O-RAN Subscription Control";
+
+        uses OranSubscriptionControlGrp;
+      }
+    }
+  }
+}

@@ -1,0 +1,429 @@
+module o-ran-wg5-delay-management {
+  yang-version 1.1;
+  namespace "urn:o-ran:wg5-delay:1.0";
+  prefix "o-ran-wg5-delay";
+
+  import o-ran-operations {
+    prefix "or-ops";
+  }
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module is for supporting WG4 Fronthaul delay management support between O-DU and O-RU.
+
+    Copyright 2020 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2020-09-25" {
+    description
+      "version 1.0.0 - first release of O-RAN O1 for O-DU YANG models";
+
+    reference "ORAN-WG5.MP.0-v01.00";
+  }
+
+  typedef ru-ref {
+    type leafref {
+      path "/or-ops:operational-info/or-ops:declarations/or-ops:ru-instance-id";
+    }
+  description
+    "A type defintion for the ru-instance-id. Although the type used in
+    o-ran-operations is only a 'string', this leafref is used to indicate
+    that the type 'ru-ref' is used to encode ru-instance-id values.
+
+    These will typically have been recovered using the NETCONF client in an
+    O-DU which has a NETCONF session with an O-RU which implements the
+    o-ran-operations.yang model. ";
+  }
+
+typedef bandwidth {
+  type uint32 {
+    range "200 | 1400 | 3000 | 5000 | 10000 | 15000 | 20000 | 25000 |
+          30000 | 40000 | 50000 | 60000 | 70000 | 80000 | 90000 | 100000
+          | 200000 | 400000" ;
+  }
+  units kilohertz;
+  description
+    "transmission bandwidth configuration in units of kHz -
+    covering NBIoT through to New Radio - see 38.104";
+}
+
+grouping bandwidth-configuration {
+  description
+    "Grouping for bandwidth and scs configuration";
+
+  leaf bandwidth {
+    type bandwidth;
+    description
+      "transmission bandwidth configuration in units of kHz -
+      covering NBIoT through to New Radio - see 38.104";
+  }
+  leaf subcarrier-spacing {
+    type uint32 {
+      range "0 .. 240000 ";
+    }
+    units Hertz;
+    description "subcarrier spacing in Hz";
+  }
+}
+
+grouping window-determine-method-group {
+  container window-determine-method {
+    description
+      "the container for configuring the window determination method to O-DU";
+    leaf method {
+      type enumeration {
+        enum HARDCODED {
+          status deprecated;
+          description
+          "O-DU transmission/reception window is determined by O-DU
+          NOTE: Deprecated as it doesn't match the O-RAN.WG5.O-DU-O1.0-v05.00 specification.";
+        }
+        enum NOT_CONFIGURED {
+          description
+          "O-DU transmission/reception window is determined by O-DU";
+        }
+        enum CONFIGURED {
+          description
+          "O-DU transmission/reception window is determined by configured value from SMO";
+        }
+      }
+      mandatory true;
+      description
+      "Method for determination of O-DU transmission/reception";
+    }
+    
+    leaf configuration-status {
+      type leafref {
+        path "/wg5-delay-management/window-determine-capability";
+        require-instance false;
+      }
+      mandatory true;
+      description
+        "Parameter representing status of configuration to be used as validator";
+    }
+
+    list pre-configured-transport-delay {
+      when "../method = 'NOT_CONFIGURED'";
+      key ru-instance-id;
+      description
+      "a list of pre-configured-transport-delay. This list is configured only in case of NOT_CONFIGURED";
+
+      leaf ru-instance-id {
+        type ru-ref;
+      }
+
+      leaf t12-min {
+        type uint32;
+        units nanoseconds;
+        mandatory true;
+        description
+          "the pre-configured minimum measured delay between DU port-ID and O-RU port-ID";
+      }
+      leaf t12-max {
+        type uint32;
+        units nanoseconds;
+        mandatory true;
+        description
+          "the pre-configured maximum measured delay between CU port-ID and O-RU port-ID";
+      }
+      leaf t34-min {
+        type uint32;
+        units nanoseconds;
+        mandatory true;
+        description
+          "the pre-configured minimum measured delay between O-RU port-ID and CU port-ID";
+      }
+      leaf t34-max {
+        type uint32;
+        units nanoseconds;
+        mandatory true;
+        description
+          "the pre-configured maximum measured delay between O-RU port-ID and CU port-ID";
+      }
+    }
+  }
+}
+
+  grouping window-determine-information-group {
+    leaf window-determine-capability {
+      type enumeration {
+        enum NOT_CONFIGURED {
+          description
+          "O-DU transmission/reception window can be determined by O-DU";
+        }
+        enum CONFIGURED {
+          description
+          "O-DU transmission/reception window can be determined by configured value from SMO";
+        }
+        enum BOTH {
+          description
+          "O-DU has both capability, NOT_CONFIGURED and CONFIGURED";
+        }
+      }
+      config false;
+      mandatory true;
+      description
+        "Capability how O-DU transmission/reception window can be determined";
+      }
+    uses window-determine-method-group;
+  }
+
+  grouping o-du-window-group {
+    list o-du-window {
+      key "ru-instance-id bandwidth subcarrier-spacing";
+      description
+      "a list of o-du-window";
+
+      leaf ru-instance-id {
+        type ru-ref;
+      }
+      uses bandwidth-configuration;
+
+    leaf ta4-min {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the earliest possible time which the O-DU can support receiving the
+      first uplink user plane IQ data message for a symbol.";
+    }
+    leaf ta4-max {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the latest possible time which the O-DU can support receiving the
+      last uplink user plane IQ data message for a symbol.";
+    }
+    leaf t1a-min-cp-dl {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the latest possible time which the O-DU can support transmiting
+      an control plane prior to transmission of the corresponding IQ
+      samples at the antenna";
+    }
+    leaf t1a-min-cp-ul {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the latest possible time which the O-DU can support transmiting
+      an control plane prior to reception of the corresponding IQ
+      samples at the antenna";
+    }
+    leaf t1a-min-up {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the latest possible time which the O-DU can support transmiting
+      an IQ data message prior to transmission of the corresponding IQ
+      samples at the antenna";
+    }
+    leaf t1a-max-cp-dl {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the earliest possible time which the O-DU can support transmiting
+      an control plane prior to transmission of the corresponding IQ
+      samples at the antenna";
+    }
+    leaf t1a-max-cp-ul {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the earliest possible time which the O-DU can support transmiting
+      an control plane prior to reception of the corresponding IQ
+      samples at the antenna";
+    }
+    leaf t1a-max-up {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the earliest possible time which the O-DU can support transmiting
+      an IQ data message prior to transmission of the corresponding IQ
+      samples at the antenna";
+    }
+  }
+}
+
+  grouping o-ru-window-group {
+    list o-ru-window {
+      key "ru-instance-id bandwidth subcarrier-spacing";
+      description
+      "a list of o-ru-window";
+      config false;
+
+      leaf ru-instance-id {
+        type ru-ref;
+        config false;
+      }
+      uses bandwidth-configuration;
+
+    leaf t2a-min-up {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the minimum O-RU data processing delay between receiving IQ data
+      message over the fronthaul interface and transmitting
+      the corresponding first IQ sample at the antenna";
+    }
+    leaf t2a-max-up {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+        "the earliest allowable time when a data packet is received before
+        the corresponding first IQ sample is transmitted at the antenna";
+    }
+    leaf t2a-min-cp-dl {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the minimum O-RU data processing delay between receiving downlink
+      real time control plane message over the fronthaul interface and
+      transmitting the corresponding first IQ sample at the antenna";
+    }
+    leaf t2a-max-cp-dl {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the earliest allowable time when a downlink real time control message
+      is received before the corresponding first IQ sample is transmitted at
+      the antenna";
+    }
+    leaf tcp-adv-dl {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the time difference (advance) between the reception window for
+      downlink real time Control messages and reception window for the
+      corresponding IQ data messages.";
+    }
+    leaf ta3-min {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the minimum O-RU data processing delay between receiving an IQ sample
+      at the antenna and transmitting the first data sample over the
+      fronthaul interface";
+    }
+    leaf ta3-max {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the maximum O-RU data processing delay between receiving an IQ sample
+      at the antenna and transmitting the last data sample over the
+      fronthaul interface";
+    }
+    leaf t2a-min-cp-ul {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the minimum O-RU data processing delay between receiving real time
+      up-link control plane message over the fronthaul interface and
+      recieving the first IQ sample at the antenna";
+    }
+    leaf t2a-max-cp-ul {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+      "the earliest allowable time when a real time up-link control message
+      is received before the corresponding first IQ sample is received  at
+      the antenna";
+    }
+  }
+}
+
+  grouping measured-transport-delay-group {
+    list measured-transport-delay {
+      key ru-instance-id;
+      config false;
+      description
+      "a list of measured-transport-delay";
+
+    leaf ru-instance-id {
+      type ru-ref;
+      config false;
+    }
+
+    leaf t12-min {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+        "the minimum measured delay between DU port-ID and O-RU port-ID";
+    }
+    leaf t12-max {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+        "the maximum measured delay between CU port-ID and O-RU port-ID";
+    }
+    leaf t34-min {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+        "the minimum measured delay between O-RU port-ID and CU port-ID";
+    }
+    leaf t34-max {
+      type uint32;
+      units nanoseconds;
+      mandatory true;
+      description
+        "the maximum measured delay between O-RU port-ID and CU port-ID";
+    }
+  }
+}
+
+      container wg5-delay-management {
+        description
+          "top level tree for supporting franthaul delay management";
+        uses window-determine-information-group;
+        uses o-du-window-group;
+        uses o-ru-window-group;
+        uses measured-transport-delay-group;
+      }
+}

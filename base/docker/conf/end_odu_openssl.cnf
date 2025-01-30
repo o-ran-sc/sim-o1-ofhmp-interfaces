@@ -1,0 +1,19 @@
+[ req ]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+prompt = no
+
+[ req_distinguished_name ]
+C = US
+ST = New Jersey
+L = New Jersey
+O = Melacon
+OU = 5G
+CN = hybrid-odu
+
+[ v3_req ]
+keyUsage = critical, digitalSignature, keyCertSign, cRLSign
+subjectAltName = @alt_names
+
+[ alt_names ]
+email.1 = client.hybrid-odu@localhost

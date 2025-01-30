@@ -1,0 +1,121 @@
+module o-ran-u-plane-tnl{
+  yang-version 1.1;
+  namespace "urn:o-ran:u-plane-tnl:1.0";
+  prefix "o-ran-u-tnl";
+  
+  organization 
+  "O-RAN Alliance";
+
+contact
+  "www.o-ran.org";
+
+description 
+  "This module defines the YANG definitions for Transport Network Layer (TNL)
+   configuration for U-plane end-points at O-DU and O-CU. This module augments 
+   3GPP SA5 data models.
+
+   Copyright 2020 the O-RAN Alliance.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+   POSSIBILITY OF SUCH DAMAGE.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+
+   * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the above disclaimer.
+   * Redistributions in binary form must reproduce the above copyright notice,
+     this list of conditions and the above disclaimer in the documentation
+     and/or other materials provided with the distribution.
+   * Neither the Members of the o-RAN Alliance nor the names of its
+     contributors may be used to endorse or promote products derived from
+     this software without specific prior written permission.";
+
+  revision "2020-09-25" {
+    description
+      "version 1.0.0 - first release of O-RAN O1 for O-DU YANG models";
+
+    reference "ORAN-WG5.MP.0-v01.00";
+  }
+  
+  typedef dscp-marking-value {
+    type uint8 {
+      range "0..63";
+    }
+    description "type definition for DSCP marking";
+  }
+  
+  grouping dscp-marking {
+    container u-plane-dscp-marking {
+      leaf gtpu-management-traffic-dscp {
+        type dscp-marking-value;
+        mandatory true;
+        description "DSCP marking for GTP-U management traffic";    
+      }
+      list qos-group-index-list {
+        key "qos-group-index";
+        min-elements 1;
+        leaf qos-group-index {
+          type uint8 {
+            range "1..32";
+          }
+          mandatory true;
+          description "QoS group index";
+        }
+        leaf nr-pdcp-dscp {
+          type dscp-marking-value;
+          mandatory true;
+          description "DSCP marking for G-PDU containing NR PDCP PDU, but no DDDS";    
+        }
+        leaf ddds-dscp {
+          type dscp-marking-value;
+          mandatory true;
+          description "DSCP marking for G-PDU including DDDS 
+         (and possibly also including NR PDCP PDU)";    
+        }
+        description "List of DSCP profiles, indexed by QoS group index";
+      }
+      description "container for DSCP markings";
+    }
+    description "grouping of DSCP markings";
+  }
+
+  
+  grouping gtp-configuration {
+    container gtp-configuration {
+      leaf periodic-echo-timer {
+        type uint16 {
+          range "60..65535";
+        }
+        mandatory true;
+        description "Periodic timer of GTP Echo message, in seconds";
+      }
+      leaf t3-response-timer-expiry {
+        type uint16 {
+          range "1..65535";        
+        }
+        mandatory true;
+        description "T3-response timer expiry value";
+      }
+      leaf n3-requests {
+        type uint16 {
+          range "1..65535";        
+        }
+        mandatory true;
+        description "N3-requests count value";
+      }
+      description "container for GTP configuration"; 
+    }
+    description "grouping GTP configurations";    
+  }  
+     
+}

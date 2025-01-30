@@ -1,0 +1,253 @@
+module o-ran-certificates {
+  yang-version 1.1;
+  namespace "urn:o-ran:certificates:1.0";
+  prefix "o-ran-cert";
+
+  import ietf-x509-cert-to-name {
+    prefix x509c2n;
+    reference
+      "RFC 7407: A YANG Data Model for SNMP Configuration";
+  }
+
+  import ietf-truststore {
+    prefix ietf-ts;
+  }
+
+  import ietf-keystore {
+    prefix ietf-ks;
+  }
+
+  import ietf-system {
+    prefix ietf-sys;
+  }
+
+  import ieee802-dot1x {
+    prefix dot1x;
+  }
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the certificates model for the O-RAN Equipment authorization.
+
+    Copyright 2024 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2024-08-12" {
+    description
+      "version 16.0.0
+
+      1) augmentation of dot1x:pae-system to configure PAE credential.
+      2) add certificate lifecycle management";
+
+    reference "ORAN-WG4.M.0-v16.00";
+  }
+
+  revision "2022-08-15" {
+    description
+      "version 10.0.0
+
+      1) initial version";
+
+    reference "ORAN-WG4.M.0-v10.00";
+  }
+
+  grouping cert-maps {
+    uses x509c2n:cert-to-name;
+    description
+      "The cert-maps container is used by a TLS-
+       based NETCONF server to map the NETCONF
+       client's presented X.509 certificate to
+       a NETCONF username.  If no matching and
+       valid cert-to-name list entry can be found,
+       then the NETCONF server MUST close the
+       connection, and MUST NOT accept NETCONF
+       messages over it.
+       Note - when included, the /cert-to-name/name refers to the schema node
+       users/user/name in o-ran-usermgmt.yang";
+    reference
+      "RFC 7407: NETCONF over TLS, Section 7";
+  }
+
+  grouping cert-exp-policy {
+    description "Configuration related to policies to be applied for certficate expiry";
+    leaf cert-lcm-policy {
+      type enumeration {
+        enum REISSUE_ON_DEMAND {
+          description
+          "When this policy is set, the O-RU shall:
+           a. Generate a public/private key pair whenever the
+              O-RU controller invokes <generate-csr> action statement on
+              the asymmetric-keys. The key length and algorithm
+              to be used are derived from SubjectPublicKeyInfo in
+              the csr-info field of the <generate-csr> action.
+           b. Initiate certificate signing request towards
+              the CA/RA server using CMPv2 whenever the O-RU controller
+              invokes the <generate-csr> action statement on
+              the asymmetric-keys, and get a reissued certificate";
+        }
+      }
+      description
+        "Configuration for the policy to be applied
+        for certificate lifecycle management";
+    }
+  }
+  grouping certificate-lcm-group-notif {
+    description "Grouping for parameters notified in certificate-lcm notification";
+    leaf certificate-name {
+      type leafref {
+        path "/ietf-ks:keystore/ietf-ks:asymmetric-keys/ietf-ks:asymmetric-key/ietf-ks:certificates/ietf-ks:certificate/ietf-ks:name";
+      }
+      description
+        "Reference to certificate that was re-issued. This should correspond to the certReqId provided in the CMPv2 IR/CR message.";
+    }
+    leaf cmpv2-procedure {
+      type enumeration {
+        enum INITIALIZATION_REQUEST {
+          description
+          "An Intitialization Request/Initialization Response procedure";
+        }
+        enum CERTIFICATION_REQUEST {
+          description
+          "A successful Certificate Request/Certificate Response procedure. If certification procedure (cp)
+           completes successfully during polling also, this cmpv2-procedure shall be included in the notification.";
+        }
+        enum POLLING_REQUEST {
+          description
+          "A Polling Request/Polling Response procedure. This procedure shall be included in the notification
+          only if the polling request is responded with a polling reponse having a PKIStatus of 3 (waiting)";
+        }
+      }
+      mandatory true;
+      description
+        "Identifies the CMPv2 procedure that has been completed";
+    }
+    leaf pki-status {
+      type uint8;
+      mandatory true;
+      description "The value of the PKIStatus from the CMPv2 response";
+    }
+    leaf-list pki-failure-info {
+      when "../pki-status = '2'";
+      type uint8 {
+        range "0..26";
+      }
+      description
+        "The failure case information derived from the PKIFailureInfo
+        from the CMPv2 response, where the uint8 value corresponds to
+        the bit position in PKIFailureInfo, i.e., a value of '0' encodes
+        badAlg and a value of '1' encodes badMessageCheck.";
+    }
+    leaf pki-free-text {
+      type string;
+      description "The text information returned by the CA/RA server";
+    }
+  }
+
+  container certificate-parameters {
+    description
+      "Top Level Container for all certificate related parameters";
+
+    container cert-maps {
+      description
+        "Container for certificate maps";
+
+      uses cert-maps;
+    }
+
+    container cert-expiry-policy {
+      description
+        "Container for configuration the certificate expiry policy";
+      uses cert-exp-policy;
+    }
+
+    container advance-cert-expiry-alarms-config {
+      description
+       "Container for configuration of advance alarms
+        for certificate expiry";
+
+      leaf minor-alarm-advance-time {
+        type uint16;
+        units days;
+        default 30;
+        description
+         "Number of days in advance, a minor alarm for certificate
+          about to expire needs to be raised";
+      }
+      leaf major-alarm-advance-time {
+        type uint16;
+        units days;
+        default 10;
+        description
+         "Number of days in advance, a major alarm for certificate
+          about to expire needs to be raised";
+      }
+      leaf critical-alarm-advance-time {
+        type uint16;
+        units days;
+        default 2;
+        description
+         "Number of days in advance, a critical alarm for certificate
+          about to expire needs to be raised";
+      }
+    }
+  }
+
+  notification certificate-lcm {
+    description
+      "Notification sent on successful CMPv2 procedure";
+    uses certificate-lcm-group-notif;
+  }
+
+  augment "/ietf-sys:system/dot1x:pae-system" {
+    if-feature "ietf-ts:certificates";
+    description
+      "Augment 802.1X PAE System with EAP-TLS credential information.";
+
+    container credential {
+      description
+        "Contain the credential configuration to be used with the PAE.";
+
+      leaf ca-root {
+        type leafref {
+          path "/ietf-ts:truststore/ietf-ts:certificate-bags/ietf-ts:certificate-bag/ietf-ts:name";
+        }
+        description
+          "The name of the trust anchor to be used in the EAP-TLS exchange.";
+      }
+      leaf client-cert {
+        type leafref {
+          path "/ietf-ks:keystore/ietf-ks:asymmetric-keys/ietf-ks:asymmetric-key/ietf-ks:certificates/ietf-ks:certificate/ietf-ks:name";
+        }
+        description
+          "The name of the client certificate to be used in the EAP-TLS exchange.";
+      }
+    }
+  }
+}

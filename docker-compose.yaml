@@ -1,0 +1,87 @@
+# /*************************************************************************
+# *
+# * Copyright 2025 highstreet technologies and others
+# *
+# * Licensed under the Apache License, Version 2.0 (the "License");
+# * you may not use this file except in compliance with the License.
+# * You may obtain a copy of the License at
+# *
+# *     http://www.apache.org/licenses/LICENSE-2.0
+# *
+# * Unless required by applicable law or agreed to in writing, software
+# * distributed under the License is distributed on an "AS IS" BASIS,
+# * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# * See the License for the specific language governing permissions and
+# * limitations under the License.
+# ***************************************************************************/
+
+services:
+  pynts-dev-du:
+    image: pynts-o-du-o1:${NTS_VERSION}
+    container_name: pynts-dev-du
+    hostname: pynts-dev-du
+    privileged: true
+    environment:
+      - ENDPOINT_COUNT=1
+
+      - NETCONF_USERNAME=netconf
+      - NETCONF_PASSWORD=netconf!
+
+      - SDNR_RESTCONF_URL=http://controller.dcn.smo.o-ran-sc.org
+      - SDNR_USERNAME=admin
+      - SDNR_PASSWORD=admin
+
+      - VES_URL=https://ves-collector.dcn.smo.o-ran-sc.org/eventListener/v7
+      - VES_USERNAME=sample1
+      - VES_PASSWORD=sample1
+    # ports:
+    #   - "830:830"
+    #   - "6513:6513"
+    volumes:
+      - ./base/docker/conf/supervisord-du.conf:/etc/supervisor/conf.d/supervisord.conf
+      - ./base/src:/app
+      - ./o-du-o1/data:/data
+      - ./o-du-o1/src:/app/extensions/o-du-o1
+      # - ./ietf-microwave/data:/data
+
+    networks:
+      oam:
+      smo:
+
+  pynts-dev-ru:
+    image: pynts-o-ru-mplane:${NTS_VERSION}
+    container_name: pynts-dev-ru
+    hostname: pynts-dev-ru
+    privileged: true
+    environment:
+      - ENDPOINT_COUNT=1
+
+      - NETCONF_USERNAME=netconf
+      - NETCONF_PASSWORD=netconf!
+
+      - SDNR_RESTCONF_URL=http://controller.dcn.smo.o-ran-sc.org
+      - SDNR_USERNAME=admin
+      - SDNR_PASSWORD=admin
+
+      - VES_URL=https://ves-collector.dcn.smo.o-ran-sc.org/eventListener/v7
+      - VES_USERNAME=sample1
+      - VES_PASSWORD=sample1
+    # ports:
+    #   - "830:830"
+    #   - "6513:6513"
+    volumes:
+      - ./base/src:/app
+      - ./o-ru-mplane/data:/data
+      - ./o-ru-mplane/data/ietf-netconf-server-running-hybrid.json:/data/ietf-netconf-server-running.json
+
+    networks:
+      oam:
+      smo:
+
+networks:
+  dmz:
+    external: true
+  smo:
+    external: true
+  oam:
+    external: true

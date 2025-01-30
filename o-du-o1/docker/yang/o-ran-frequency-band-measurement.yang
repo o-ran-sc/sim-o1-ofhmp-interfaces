@@ -1,0 +1,281 @@
+module o-ran-frequency-band-measurement {
+  yang-version 1.1;
+  namespace "urn:o-ran:frequency-band-measurement:1.0";
+  prefix "o-ran-frequency-band-measurement";
+
+  import o-ran-uplane-conf {
+    prefix "up";
+  }
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the measurements for operation in specific frequency-band measurement.
+
+    Copyright 2024 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2024-08-12" {
+    description
+      "version 16.0.0
+
+      1) initial version";
+
+      reference "ORAN-WG4.M.0-v16.00";
+  }
+
+  typedef measurement-bandwidth {
+    type enumeration {
+      enum 1MHZ {
+        description
+          "1 MHz measurement bandwidth";
+      }
+      enum 5MHZ {
+        description
+          "5 MHz measurement bandwidth";
+      }
+      enum 10MHZ {
+        description
+          "10 MHz measurement bandwidth";
+      }
+      enum 20MHZ {
+        description
+          "20 MHz measurement bandwidth";
+      }
+      enum 50MHZ {
+        description
+          "50 MHz measurement bandwidth";
+      }
+      enum 100MHZ {
+        description
+          "100 MHz measurement bandwidth";
+      }
+    }
+    description
+      "Measurement unit bandwidths";
+  }
+
+  grouping output-status-grouping {
+    description "Status grouping";
+    leaf status {
+      type enumeration {
+        enum SUCCEEDED {
+          description
+            "The operation has been performed without error.";
+        }
+        enum FAILED {
+          description
+            "The operation has been failed, detailed information can be found in error-message.";
+        }
+      }
+      mandatory true;
+      description
+        "This is the result that the operation has been performed.";
+    }
+    leaf error-message {
+      when "../status = 'FAILED'";
+      type string;
+      description
+        "The detailed error message when the operation has been failed.";
+    }
+  }
+
+  grouping received-measurement-result {
+    description
+      "This group indicates the result of received power measurements by O-RU.";
+    list received-power-measurement {
+      key "measurement-frequency";
+      description
+        "This list indicates the received power measurements result for the given spectrum.";
+      leaf measurement-frequency {
+        type uint32;
+        units "MHz";
+        description
+          "This is the starting frequency in MHz for which the received power measurement was performed.";
+      }
+      leaf measurement-bandwidth {
+        type measurement-bandwidth;
+        mandatory true;
+        description
+          "This is the measurement unit bandwidth in MHz";
+        }
+      leaf received-power {
+        type decimal64{
+          fraction-digits 4;
+        }
+        units "dBm";
+
+        description
+          "This is the average of the scalar values of received power, converted into dBm units.
+          The received power is mesured over the frequency range from measure-frequency as the lower bound and
+          measure-frequency + measure-bandwidth as the upper bound.
+          The received power is calculated according to what is foreseen by the specific shared spectrum service used,
+          i.e. for CBRS the Winn Forum definition will have to be used, for other shared band services other calculationmethods might be considered/used.";
+      }
+    }
+  }
+
+  grouping request-spectrum-for-measurement {
+    description
+      "This group indicates the requested measurements by O-RU.";
+    leaf measurement-bandwidth {
+      type measurement-bandwidth;
+      mandatory true;
+      description
+        "This is the measurement unit bandwidth in MHz";
+    }
+    leaf-list measurement-start-frequency {
+        type uint32;
+        units "MHz";
+        description
+          "This is the starting frequency bandwidth in MHz to perform the received power measurement.";
+    }
+  }
+
+  container measurement-capability {
+    config false;
+    description
+      "measurement capability object responsible for providing deatils of O-RU's
+      frequency and band measurement capability.";
+    list measurement-bands-supported {
+      key "measurement-band-num";
+        description
+          "This is the list of supported band capability for O-RU received power measurement.";
+      leaf measurement-band-num {
+        type uint8;
+        description
+          "This is the supported bandnum where O-RU can perform the received power measurement. e.g. band48 for CBRS.";
+      }
+      list frequencys-range-supported {
+        key "lower-frequency";
+        description
+          "This list indicates the frequecy range for which the measurements are supported in the O-RU.";
+        leaf lower-frequency {
+          type uint32;
+          units "MHz";
+          description
+            "This is the lower frequency bandwidth in MHz can perform the received power measurement.";
+        }
+        leaf upper-frequency {
+          type uint32;
+          units "MHz";
+          description
+            "This is the upper frequency bandwidth in MHz can perform the received power measurement.";
+        }
+      }
+      leaf-list measurement-bandwidth {
+        type measurement-bandwidth;
+        description
+          "The supported measurement unit bandwidths";
+      }
+    }
+    leaf in-service-measurement {
+      type boolean;
+      default false;
+      description
+        "indicates whether O-RU can support measurements
+        when tx-array carriers are active in measurement band.";
+    }
+
+   leaf in-service-measurement-only-carrier-freq {
+       when "../in-service-measurement = 'true'";
+       type boolean;
+       default false;
+       description
+          "Indicate an O-RU only support measurement on frequency range as carrier is configured on.";
+    }
+
+    leaf-list supported-measurement-points {
+      type enumeration {
+        enum NO_ARRAY {
+          description
+            "O-RU supports measurements without the rx-array name provided.";
+        }
+        enum ONE_ARRAY {
+          description
+            "O-RU supports measurements with a single rx-array name provided.";
+        }
+        enum MULTIPLE_ARRAYS {
+          description
+            "O-RU supports measurements with multiple rx-array names provided.";
+        }
+     }
+     description
+       "Indicates which measurement points O-RU supports.
+       At least one point shall be provided.";
+    }
+  }
+
+  //rpc definitions
+  rpc received-power-measurement-request {
+    description
+      "This rpc is to request a received power measurement in O-RU.";
+    input {
+      uses request-spectrum-for-measurement;
+
+      leaf-list rx-array {
+        type leafref {
+          path "/up:user-plane-configuration/up:rx-arrays/up:name";
+        }
+        description
+          "Names of arrays on which the measurements are requested.
+          Depending on the values reported in supported-measurement-points:
+          * if O-RU reports NO_ARRAY, then an empty list can be provided.
+          * if O-RU reports ONE_ARRAY, then a single rx-array can be provided.
+          * if O-RU reports MULTIPLE_ARRAYS, then multiple rx-arrays can be provided.";
+      }
+    }
+    output {
+      uses output-status-grouping;
+      leaf wait-time {
+        type uint32;
+        units "seconds";
+        description
+          "This is the wait time recommended by O-RU. Requester should wait for mentioned time to get the report if status is SUCCEEDED.
+          If the status is FAILED then request should wait for mentioned time before requesting again.";
+      }
+      leaf measurement-id {
+        type uint8;
+        description
+          "Used to identify a measurement RPC, when andling of multiple RPCs.";
+      }
+    }
+  }
+
+  notification power-measurement-result {
+    description "Notification the measurement results for CBRS.";
+    uses output-status-grouping;
+    uses received-measurement-result;
+    leaf measurement-id {
+        type uint8;
+        description
+          "Used to identify a measurement RPC, when andling of multiple RPCs.";
+    }
+  }
+}

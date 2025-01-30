@@ -1,0 +1,107 @@
+module o-ran-aggregation-base {
+  yang-version 1.1;
+  namespace "urn:o-ran:agg-base:1.0";
+  prefix "or-agg-base";
+
+  import o-ran-operations {
+    prefix "or-ops";
+  }
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the base model used for aggregating WG4 YANG models.
+
+    Individual YANG models are expected to augment this base model with their
+    own schema trees to facilitate operations on a per ru-instance-id basis.
+
+    Copyright 2020 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2020-09-25" {
+    description
+      "version 1.0.0 - first release of O-RAN O1 for O-DU YANG models";
+
+    reference "ORAN-WG5.MP.0-v01.00";
+  }
+
+  typedef ru-ref {
+    type leafref {
+      path "/or-ops:operational-info/or-ops:declarations/or-ops:ru-instance-id";
+    }
+    description
+      "A type defintion for the ru-instance-id. Although the type used in
+      o-ran-operations is only a 'string', this leafref is used to indicate
+      that the type 'ru-ref' is used to encode ru-instance-id values.
+
+      These will typically have been recovered using the NETCONF client in an
+      O-DU which has a NETCONF session with an O-RU which implements the
+      o-ran-operations.yang model. ";
+  }
+
+  grouping ru-grouping {
+    list recovered-ru-instance-ids {
+      key ru-instance-id;
+      config false;
+      description
+        "a list of O-RU instance IDs that have  been recovered by an O-DU which
+        either has:
+        i) a NETCONF session with an O-RU using the O-RAN WG4 fronthaul
+        defined NETCONF/YANG interface, or
+        ii) some vendor proprietary scheme for a managed element that integrates
+        both O-DU and O-RU functionality.";
+
+      leaf ru-instance-id {
+        type ru-ref;
+        config false;
+      }
+    }
+    list aggregation {
+      key ru-instance;
+      description
+        "a list used to aggregate the configuration and operational state of
+        multiple O-RUs.";
+
+      leaf ru-instance {
+        type leafref {
+          path "/aggregated-o-ru/recovered-ru-instance-ids/ru-instance-id";
+          require-instance false;
+        }
+      }
+    }
+  }
+
+  container aggregated-o-ru {
+    description
+      "The top level container used to hold all the aggregated information related
+      to a set of O-RUs.";
+
+    uses ru-grouping;
+  }
+}

@@ -1,0 +1,57 @@
+# /*************************************************************************
+# *
+# * Copyright 2025 highstreet technologies and others
+# *
+# * Licensed under the Apache License, Version 2.0 (the "License");
+# * you may not use this file except in compliance with the License.
+# * You may obtain a copy of the License at
+# *
+# *     http://www.apache.org/licenses/LICENSE-2.0
+# *
+# * Unless required by applicable law or agreed to in writing, software
+# * distributed under the License is distributed on an "AS IS" BASIS,
+# * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# * See the License for the specific language governing permissions and
+# * limitations under the License.
+# ***************************************************************************/
+
+services:
+  pynts-o-du-o1:
+    image: pynts-o-du-o1:${NTS_VERSION}
+    container_name: pynts-o-du-o1
+    hostname: pynts-o-du-o1
+    privileged: true
+    environment:
+      - ENDPOINT_COUNT=1
+
+      - NETCONF_USERNAME=netconf
+      - NETCONF_PASSWORD=netconf!
+
+      - O_DU_CALLHOME_PORT=4335
+
+      - SDNR_RESTCONF_URL=https://controller.dcn.smo.o-ran-sc.org
+      - SDNR_USERNAME=admin
+      - SDNR_PASSWORD=Kp8bJ4SXszM0WXlhak3eHlcse2gAw84vaoGGmJvUy2U
+
+      - VES_URL=http://ves-collector.dcn.smo.o-ran-sc.org/eventListener/v7
+      - VES_USERNAME=sample1
+      - VES_PASSWORD=sample1
+    # ports:
+    #   - "830:830"
+    #   - "6513:6513"
+    extra_hosts:
+      - "controller.dcn.${HTTP_DOMAIN}:${HOST_IP}"
+      - "ves-collector.dcn.${HTTP_DOMAIN}:${HOST_IP}"
+    volumes:
+      - ./o-du-o1/data:/data
+    networks:
+      oam:
+      smo:
+
+networks:
+  dmz:
+    external: true
+  smo:
+    external: true
+  oam:
+    external: true
