@@ -30,7 +30,7 @@ This file configures the performance data generation. It contains two objects:
 - the values are integer format
 - each object *MUST* contain data for *ALL* points defined
 
-### performance-management/template.xml
+### performance-management/template_5G_NR.xml
 
 The template is defined by this file. By design, it is an XML file.
 

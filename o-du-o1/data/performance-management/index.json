@@ -6,25 +6,35 @@
         "points": [
             "DRB.MeanActiveUeDl",
             "DRB.MeanActiveUeUl",
-            "DRB.MaxActiveUeDl"
+            "DRB.UEThpDl",
+            "DRB.UEThpUl"
         ]
     },
 
     "values": [
         {
-            "DRB.MeanActiveUeDl": 0,
-            "DRB.MaxActiveUeDl": 3,
-            "DRB.MeanActiveUeUl": 17
+            "DRB.MeanActiveUeDl": 22,
+            "DRB.MeanActiveUeUl": 3,
+            "DRB.UEThpDl": 17,
+            "DRB.UEThpUl": 5
         },
         {
-            "DRB.MeanActiveUeDl": 1,
-            "DRB.MaxActiveUeDl": 4,
-            "DRB.MeanActiveUeUl": 19
+            "DRB.MeanActiveUeDl": 27,
+            "DRB.MeanActiveUeUl": 4,
+            "DRB.UEThpDl": 19,
+            "DRB.UEThpUl": 7
         },
         {
-            "DRB.MeanActiveUeDl": 2,
-            "DRB.MaxActiveUeDl": 9,
-            "DRB.MeanActiveUeUl": 19
+            "DRB.MeanActiveUeDl": 30,
+            "DRB.MeanActiveUeUl": 9,
+            "DRB.UEThpDl": 19,
+            "DRB.UEThpUl": 3
+        },
+        {
+          "DRB.MeanActiveUeDl": 5,
+          "DRB.MeanActiveUeUl": 4,
+          "DRB.UEThpDl": 3,
+          "DRB.UEThpUl": 3
         }
     ]
 }

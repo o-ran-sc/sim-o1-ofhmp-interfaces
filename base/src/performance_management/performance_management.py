@@ -90,8 +90,8 @@ class PerformanceManagement:
         # apply vsftpd changes
         os.system("killall -9 vsftpd")
 
-        # read template from performance-management/template.xml
-        template_path = '/data/performance-management/template.xml'
+        # read template from performance-management/template_5G_NR.xml
+        template_path = '/data/performance-management/template_5G_NR.xml'
         if Path(template_path).exists():
             with open(template_path, 'r') as file:
                 self.template = file.read()

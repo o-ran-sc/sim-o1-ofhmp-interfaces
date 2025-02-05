@@ -140,3 +140,5 @@ integration/.env*
 
 # VS Code
 .vscode/
+
+base/docker/conf/*.p12
