@@ -1,0 +1,10 @@
+Verified+1: ORAN Required GHA <releng+oran.required.gha@linuxfoundation.org>
+Verified+1: Martin Skorupski <martin.skorupski@highstreet-technologies.com>
+Code-Review+2: Alex Stancu <alexandru.stancu@highstreet-technologies.com>
+Code-Review+2: Martin Skorupski <martin.skorupski@highstreet-technologies.com>
+Submitted-by: Martin Skorupski <martin.skorupski@highstreet-technologies.com>
+Submitted-at: Thu, 06 Feb 2025 10:03:54 +0000
+Reviewed-on: https://gerrit.o-ran-sc.org/r/c/sim/o1-ofhmp-interfaces/+/14140
+Comments-Total: 1
+Project: sim/o1-ofhmp-interfaces
+Branch: refs/heads/master
